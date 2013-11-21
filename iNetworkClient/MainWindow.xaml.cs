@@ -77,5 +77,11 @@ namespace iNetworkClient
             // msg.AddField("Name-of-Field", 0);
             // this._connection.SendMessage(msg);
         }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+                Application.Current.Shutdown();
+        }
     }
 }
