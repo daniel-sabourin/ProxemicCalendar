@@ -1,8 +1,9 @@
 ﻿<Window x:Class="iNetworkClient.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Controls="clr-namespace:iNetworkClient"
         Title="Proxemic Display" Height="350" Width="525" WindowState="Maximized" WindowStyle="None" KeyUp="Window_KeyUp" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
-        
+        <Controls:SkeletonVisualizer x:Name="SkeletonViz"></Controls:SkeletonVisualizer>
     </Grid>
 </Window>

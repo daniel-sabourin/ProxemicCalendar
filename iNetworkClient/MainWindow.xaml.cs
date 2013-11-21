@@ -126,6 +126,7 @@ namespace iNetworkClient
                 // Start the sensor!
                 try
                 {
+                    SkeletonViz.Sensor = this.sensor;
                     this.sensor.Start();
                 }
                 catch (IOException)
@@ -149,7 +150,18 @@ namespace iNetworkClient
         /// <param name="e">event arguments</param>
         private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
         {
+            Skeleton[] skeletons = new Skeleton[0];
 
+            using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+            {
+                if (skeletonFrame != null)
+                {
+                    skeletons = new Skeleton[skeletonFrame.SkeletonArrayLength];
+                    skeletonFrame.CopySkeletonDataTo(skeletons);
+                }
+            }
+
+            SkeletonViz.DrawSkeletons(skeletons);
         }
 
 
