@@ -12,8 +12,11 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Microsoft.Kinect;
+
 using GroupLab.iNetwork;
 using GroupLab.iNetwork.Tcp;
+using System.IO;
 
 namespace iNetworkClient
 {
@@ -25,6 +28,8 @@ namespace iNetworkClient
         private Connection _connection;
         private string _ipAddress = "127.0.0.1";
         private int _port = 12345;
+
+        private KinectSensor sensor;
 
         #region iNetwork Methods
 
@@ -83,5 +88,70 @@ namespace iNetworkClient
             if (e.Key == Key.Escape)
                 Application.Current.Shutdown();
         }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (null != this.sensor)
+            {
+                this.sensor.Stop();
+            }
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+            #region Kinect Setup
+
+            // Look through all sensors and start the first connected one.
+            // This requires that a Kinect is connected at the time of app startup.
+            // To make your app robust against plug/unplug, 
+            // it is recommended to use KinectSensorChooser provided in Microsoft.Kinect.Toolkit (See components in Toolkit Browser).
+            foreach (var potentialSensor in KinectSensor.KinectSensors)
+            {
+                if (potentialSensor.Status == KinectStatus.Connected)
+                {
+                    this.sensor = potentialSensor;
+                    break;
+                }
+            }
+
+            if (null != this.sensor)
+            {
+                // Turn on the skeleton stream to receive skeleton frames
+                this.sensor.SkeletonStream.Enable();
+
+                // Add an event handler to be called whenever there is new color frame data
+                this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
+
+                // Start the sensor!
+                try
+                {
+                    this.sensor.Start();
+                }
+                catch (IOException)
+                {
+                    this.sensor = null;
+                }
+            }
+
+            if (null == this.sensor)
+            {
+                Console.WriteLine("No Kinect Found");
+            }
+
+            #endregion
+        }
+
+                /// <summary>
+        /// Event handler for Kinect sensor's SkeletonFrameReady event
+        /// </summary>
+        /// <param name="sender">object sending the event</param>
+        /// <param name="e">event arguments</param>
+        private void SensorSkeletonFrameReady(object sender, SkeletonFrameReadyEventArgs e)
+        {
+
+        }
+
+
     }
 }
