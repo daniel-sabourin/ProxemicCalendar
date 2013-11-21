@@ -62,6 +62,11 @@ namespace iNetworkClient
         private readonly Brush inferredJointBrush = Brushes.Yellow;
 
         /// <summary>
+        /// Brush used for drawing clipping rectangles
+        /// </summary>
+        private readonly Brush clippingBrush = new SolidColorBrush(Color.FromArgb(128, 255, 0, 0));
+
+        /// <summary>
         /// Pen used for drawing bones that are currently tracked
         /// </summary>
         private readonly Pen trackedBonePen = new Pen(Brushes.Green, 6);
@@ -97,7 +102,7 @@ namespace iNetworkClient
             using (DrawingContext dc = this.drawingGroup.Open())
             {
                 // Draw a transparent background to set the render size
-                dc.DrawRectangle(Brushes.Black, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
+                dc.DrawRectangle(Brushes.Transparent, null, new Rect(0.0, 0.0, RenderWidth, RenderHeight));
 
                 if (skeletons.Length != 0)
                 {
@@ -238,12 +243,12 @@ namespace iNetworkClient
         /// </summary>
         /// <param name="skeleton">skeleton to draw clipping information for</param>
         /// <param name="drawingContext">drawing context to draw to</param>
-        private static void RenderClippedEdges(Skeleton skeleton, DrawingContext drawingContext)
+        private void RenderClippedEdges(Skeleton skeleton, DrawingContext drawingContext)
         {
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Bottom))
             {
                 drawingContext.DrawRectangle(
-                    Brushes.Red,
+                    clippingBrush,
                     null,
                     new Rect(0, RenderHeight - ClipBoundsThickness, RenderWidth, ClipBoundsThickness));
             }
@@ -251,7 +256,7 @@ namespace iNetworkClient
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Top))
             {
                 drawingContext.DrawRectangle(
-                    Brushes.Red,
+                    clippingBrush,
                     null,
                     new Rect(0, 0, RenderWidth, ClipBoundsThickness));
             }
@@ -259,7 +264,7 @@ namespace iNetworkClient
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Left))
             {
                 drawingContext.DrawRectangle(
-                    Brushes.Red,
+                    clippingBrush,
                     null,
                     new Rect(0, 0, ClipBoundsThickness, RenderHeight));
             }
@@ -267,7 +272,7 @@ namespace iNetworkClient
             if (skeleton.ClippedEdges.HasFlag(FrameEdges.Right))
             {
                 drawingContext.DrawRectangle(
-                    Brushes.Red,
+                    clippingBrush,
                     null,
                     new Rect(RenderWidth - ClipBoundsThickness, 0, ClipBoundsThickness, RenderHeight));
             }
