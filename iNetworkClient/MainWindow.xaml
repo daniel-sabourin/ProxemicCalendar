@@ -4,6 +4,8 @@
         xmlns:Controls="clr-namespace:iNetworkClient"
         Title="Proxemic Display" Height="350" Width="525" WindowState="Maximized" WindowStyle="None" KeyUp="Window_KeyUp" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
+        <MediaElement Name="mediaElement" Stretch="Fill"></MediaElement>
+        
         <Controls:SkeletonVisualizer x:Name="SkeletonViz"></Controls:SkeletonVisualizer>
     </Grid>
 </Window>

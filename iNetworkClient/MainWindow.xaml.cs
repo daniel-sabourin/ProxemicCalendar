@@ -76,11 +76,21 @@ namespace iNetworkClient
         {
             InitializeComponent();
             InitializeConnection();
+            InitializeBackgroundMovie();
+        }
 
-            // to send a message 
-            // Message msg = new Message("Name-of-Message");
-            // msg.AddField("Name-of-Field", 0);
-            // this._connection.SendMessage(msg);
+        private void InitializeBackgroundMovie()
+        {
+            // Code for the background movie
+            mediaElement.LoadedBehavior = MediaState.Manual;
+            mediaElement.SpeedRatio = 1;
+            mediaElement.MediaEnded += delegate(object sender, RoutedEventArgs e)
+            {
+                mediaElement.Stop();
+                mediaElement.Play();
+            };
+            mediaElement.Source = new Uri(Environment.CurrentDirectory + "/../../Resources/background.mov");
+            mediaElement.Play();
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
