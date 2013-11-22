@@ -63,9 +63,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CalendarEvent.xaml.cs">
+      <DependentUpon>CalendarEvent.xaml</DependentUpon>
+    </Compile>
     <Compile Include="SkeletonVisualizer.xaml.cs">
       <DependentUpon>SkeletonVisualizer.xaml</DependentUpon>
     </Compile>
+    <Page Include="CalendarEvent.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -109,6 +116,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\background.mov" />
+    <Resource Include="Resources\Koala.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

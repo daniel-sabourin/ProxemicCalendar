@@ -9,6 +9,8 @@
         <MediaElement Name="mediaElement" Stretch="Fill"></MediaElement>
         
         <Controls:SkeletonVisualizer x:Name="SkeletonViz"></Controls:SkeletonVisualizer>
+        
+        <s:ScatterView x:Name="MainScatterView"></s:ScatterView>
 
     </Grid>
 </Window>

@@ -17,6 +17,7 @@ using Microsoft.Kinect;
 using GroupLab.iNetwork;
 using GroupLab.iNetwork.Tcp;
 using System.IO;
+using Microsoft.Surface.Presentation.Controls;
 
 namespace iNetworkClient
 {
@@ -75,8 +76,12 @@ namespace iNetworkClient
         public MainWindow()
         {
             InitializeComponent();
-            InitializeConnection();
+            //InitializeConnection();
             InitializeBackgroundMovie();
+
+
+            CalendarEvent ce = new CalendarEvent();
+            MainScatterView.Items.Add(ce.CreateScatterViewItem());
         }
 
         private void InitializeBackgroundMovie()
