@@ -12,6 +12,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Surface.Presentation.Controls;
+using System.Globalization;
 
 namespace iNetworkClient
 {
@@ -43,6 +44,38 @@ namespace iNetworkClient
             svi.Loaded += loadedEventHandler;
 
             return svi;
+        }
+
+        private double CalculateFontSize()
+        {
+            // Very bad algorithm!
+            for (int i = 12; i < 150; i++)
+            {
+                double testWidth = MeasureString(i, textLabel).Width;
+                if (testWidth > this.ActualWidth - 40)
+                    return i;
+            }
+
+            return 150;
+        }
+
+        private Size MeasureString(double fontSize, Label label)
+        {
+            var formattedText = new FormattedText(
+                label.Content.ToString(),
+                CultureInfo.CurrentUICulture,
+                FlowDirection.LeftToRight,
+                new Typeface(label.FontFamily, label.FontStyle, label.FontWeight, label.FontStretch),
+                fontSize,
+                Brushes.Black);
+
+            return new Size(formattedText.Width, formattedText.Height);
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            double fontSize = CalculateFontSize();
+            textLabel.FontSize = fontSize;
         }
     }
 }
