@@ -36,6 +36,7 @@ namespace iNetworkClient
         CalendarEvent ce;
         CalendarEvent ce1;
         CalendarEvent ce2;
+        CalendarEvent ce3;
 
         #region iNetwork Methods
 
@@ -87,11 +88,14 @@ namespace iNetworkClient
             ce = new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg") , DateTime.Now);
             MainScatterView.Items.Add(ce.CreateScatterViewItem());
 
-            ce1 = new CalendarEvent("Medic!", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now);
+            ce1 = new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now);
             MainScatterView.Items.Add(ce1.CreateScatterViewItem());
 
-            ce2 = new CalendarEvent("Halp now!", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now);
+            ce2 = new CalendarEvent("Globalfest", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Now);
             MainScatterView.Items.Add(ce2.CreateScatterViewItem());
+
+            ce3 = new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now);
+            MainScatterView.Items.Add(ce3.CreateScatterViewItem());
         }
 
         private Image CreateImageFromFile(string path)
@@ -129,6 +133,7 @@ namespace iNetworkClient
             ce.EventState = iNetworkClient.CalendarEvent.State.Medium;
             ce1.EventState = iNetworkClient.CalendarEvent.State.Medium;
             ce2.EventState = iNetworkClient.CalendarEvent.State.Medium;
+            ce3.EventState = iNetworkClient.CalendarEvent.State.Medium;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
