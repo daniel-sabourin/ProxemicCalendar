@@ -34,6 +34,8 @@ namespace iNetworkClient
         private KinectSensor sensor;
 
         CalendarEvent ce;
+        CalendarEvent ce1;
+        CalendarEvent ce2;
 
         #region iNetwork Methods
 
@@ -82,16 +84,27 @@ namespace iNetworkClient
             //InitializeConnection();
             InitializeBackgroundMovie();
 
+            ce = new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg") , DateTime.Now);
+            MainScatterView.Items.Add(ce.CreateScatterViewItem());
+
+            ce1 = new CalendarEvent("Medic!", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now);
+            MainScatterView.Items.Add(ce1.CreateScatterViewItem());
+
+            ce2 = new CalendarEvent("Halp now!", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now);
+            MainScatterView.Items.Add(ce2.CreateScatterViewItem());
+        }
+
+        private Image CreateImageFromFile(string path)
+        {
             Image myImage3 = new Image();
             BitmapImage bi3 = new BitmapImage();
             bi3.BeginInit();
-            bi3.UriSource = new Uri("../../Resources/Koala.jpg", UriKind.Relative);
+            bi3.UriSource = new Uri(path, UriKind.Relative);
             bi3.EndInit();
             myImage3.Stretch = Stretch.Fill;
             myImage3.Source = bi3;
 
-            ce = new CalendarEvent("Doctor's Appointment", myImage3 , DateTime.Now);
-            MainScatterView.Items.Add(ce.CreateScatterViewItem());
+            return myImage3;
         }
 
         private void InitializeBackgroundMovie()
@@ -114,6 +127,8 @@ namespace iNetworkClient
                 Application.Current.Shutdown();
 
             ce.EventState = iNetworkClient.CalendarEvent.State.Medium;
+            ce1.EventState = iNetworkClient.CalendarEvent.State.Medium;
+            ce2.EventState = iNetworkClient.CalendarEvent.State.Medium;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
