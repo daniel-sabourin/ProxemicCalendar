@@ -19,6 +19,7 @@ using GroupLab.iNetwork.Tcp;
 using System.IO;
 using Microsoft.Surface.Presentation.Controls;
 
+
 namespace iNetworkClient
 {
     /// <summary>
@@ -31,6 +32,8 @@ namespace iNetworkClient
         private int _port = 12345;
 
         private KinectSensor sensor;
+
+        CalendarEvent ce;
 
         #region iNetwork Methods
 
@@ -79,8 +82,15 @@ namespace iNetworkClient
             //InitializeConnection();
             InitializeBackgroundMovie();
 
+            Image myImage3 = new Image();
+            BitmapImage bi3 = new BitmapImage();
+            bi3.BeginInit();
+            bi3.UriSource = new Uri("../../Resources/Koala.jpg", UriKind.Relative);
+            bi3.EndInit();
+            myImage3.Stretch = Stretch.Fill;
+            myImage3.Source = bi3;
 
-            CalendarEvent ce = new CalendarEvent();
+            ce = new CalendarEvent("Doctor's Appointment", myImage3 , DateTime.Now);
             MainScatterView.Items.Add(ce.CreateScatterViewItem());
         }
 
@@ -102,6 +112,8 @@ namespace iNetworkClient
         {
             if (e.Key == Key.Escape)
                 Application.Current.Shutdown();
+
+            ce.EventState = iNetworkClient.CalendarEvent.State.Medium;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)

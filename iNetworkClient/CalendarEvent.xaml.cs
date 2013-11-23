@@ -13,6 +13,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Surface.Presentation.Controls;
 using System.Globalization;
+using System.Windows.Media.Animation;
 
 namespace iNetworkClient
 {
@@ -21,9 +22,64 @@ namespace iNetworkClient
     /// </summary>
     public partial class CalendarEvent : UserControl
     {
-        public CalendarEvent()
+        public const double BlackBackgroundOpacity = 0.55;
+        public TimeSpan FadeDuration = TimeSpan.FromSeconds(1);
+
+
+        public enum State { Close, Medium, Far };
+        private State _eventState = State.Far;
+        public State EventState
+        {
+            get { return _eventState; }
+            set
+            {
+                _eventState = value;
+                AnimateToState(EventState);
+            }
+        }
+
+
+        private string _eventName;
+        public string EventName
+        {
+            get { return _eventName; }
+            set
+            {
+                _eventName = value;
+                textLabel.Content = EventName;
+                ResizeFont();
+            }
+        }
+
+        private Image _image;
+        public Image Image
+        {
+            get { return _image; }
+            set
+            {
+                _image = value;
+                imageBrush.ImageSource = Image.Source;
+            }
+        }
+
+        private DateTime _date;
+        public DateTime Date
+        {
+            get { return _date; }
+            set
+            {
+                _date = value;
+            }
+        }
+
+
+        public CalendarEvent(string name, Image image, DateTime date)
         {
             InitializeComponent();
+
+            EventName = name;
+            Image = image;
+            Date = date;
         }
 
         public ScatterViewItem CreateScatterViewItem()
@@ -33,6 +89,7 @@ namespace iNetworkClient
             svi.ShowsActivationEffects = false;
             svi.BorderBrush = System.Windows.Media.Brushes.Transparent;
 
+            // Removing the shadow on ScatterViewItem
             RoutedEventHandler loadedEventHandler = null;
             loadedEventHandler = new RoutedEventHandler(delegate
             {
@@ -56,6 +113,7 @@ namespace iNetworkClient
                     return i;
             }
 
+            // Max font size is 150
             return 150;
         }
 
@@ -74,8 +132,34 @@ namespace iNetworkClient
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            ResizeFont();
+        }
+
+        private void ResizeFont()
+        {
             double fontSize = CalculateFontSize();
             textLabel.FontSize = fontSize;
+        }
+
+        private void AnimateToState(State state)
+        {
+            switch (state)
+            {
+                case State.Close:
+                    break;
+                case State.Medium:
+
+                    DoubleAnimation backgroundAnimation = new DoubleAnimation(blackBackgroundEllipse.Opacity, BlackBackgroundOpacity, FadeDuration);
+                    DoubleAnimation textAnimation = new DoubleAnimation(textLabel.Opacity, 1, FadeDuration);
+                    textLabel.BeginAnimation(Label.OpacityProperty, textAnimation);
+                    blackBackgroundEllipse.BeginAnimation(Ellipse.OpacityProperty, backgroundAnimation);
+
+                    break;
+                case State.Far:
+                    break;
+                default:
+                    break;
+            }
         }
     }
 }

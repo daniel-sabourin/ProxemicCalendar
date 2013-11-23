@@ -13,9 +13,9 @@
             </Ellipse.Fill>
         </Ellipse>
         
-        <Ellipse Fill="#8B000000"></Ellipse>
+        <Ellipse Fill="Black" Opacity="0" Name="blackBackgroundEllipse"></Ellipse>
 
-            <Label x:Name="textLabel" FontSize="40" Content="Hello" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" FontFamily="Roboto" Margin="3,0" HorizontalContentAlignment="Center">
+            <Label x:Name="textLabel" FontSize="40" Content="Hello" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" FontFamily="Roboto" Margin="3,0" HorizontalContentAlignment="Center" Opacity="0">
                 <Label.Effect>
                     <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.75" BlurRadius="5"/>
                 </Label.Effect>
