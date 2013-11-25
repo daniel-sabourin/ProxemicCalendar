@@ -22,7 +22,8 @@ namespace iNetworkClient
     /// </summary>
     public partial class CalendarEvent : UserControl
     {
-        public const double BlackBackgroundOpacity = 0.55;
+        public const double BlackBackgroundOpacityMax = 0.55;
+        public const double BlackBackgroundOpacityMin = 0.2;
         public TimeSpan FadeDuration = TimeSpan.FromSeconds(1);
 
 
@@ -149,13 +150,18 @@ namespace iNetworkClient
                     break;
                 case State.Medium:
 
-                    DoubleAnimation backgroundAnimation = new DoubleAnimation(blackBackgroundEllipse.Opacity, BlackBackgroundOpacity, FadeDuration);
+                    DoubleAnimation backgroundAnimation = new DoubleAnimation(blackBackgroundEllipse.Opacity, BlackBackgroundOpacityMax, FadeDuration);
                     DoubleAnimation textAnimation = new DoubleAnimation(textLabel.Opacity, 1, FadeDuration);
                     textLabel.BeginAnimation(Label.OpacityProperty, textAnimation);
                     blackBackgroundEllipse.BeginAnimation(Ellipse.OpacityProperty, backgroundAnimation);
 
                     break;
                 case State.Far:
+                    DoubleAnimation backgroundAnimation1 = new DoubleAnimation(blackBackgroundEllipse.Opacity, BlackBackgroundOpacityMin, FadeDuration);
+                    DoubleAnimation textAnimation1 = new DoubleAnimation(textLabel.Opacity, 0, FadeDuration);
+                    textLabel.BeginAnimation(Label.OpacityProperty, textAnimation1);
+                    blackBackgroundEllipse.BeginAnimation(Ellipse.OpacityProperty, backgroundAnimation1);
+
                     break;
                 default:
                     break;

@@ -129,11 +129,6 @@ namespace iNetworkClient
         {
             if (e.Key == Key.Escape)
                 Application.Current.Shutdown();
-
-            ce.EventState = iNetworkClient.CalendarEvent.State.Medium;
-            ce1.EventState = iNetworkClient.CalendarEvent.State.Medium;
-            ce2.EventState = iNetworkClient.CalendarEvent.State.Medium;
-            ce3.EventState = iNetworkClient.CalendarEvent.State.Medium;
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -209,6 +204,31 @@ namespace iNetworkClient
             }
 
             SkeletonViz.DrawSkeletons(skeletons);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            CalendarEvent.State state = CalendarEvent.State.Close;
+
+            switch (((Button)sender).Content.ToString())
+            {
+                case "Close":
+                    state = CalendarEvent.State.Close;
+                    break;
+                case "Medium":
+                    state = CalendarEvent.State.Medium;
+                    break;
+                case "Far":
+                    state = CalendarEvent.State.Far;
+                    break;
+                default:
+                    break;
+            }
+
+            ce.EventState = state;
+            ce1.EventState = state;
+            ce2.EventState = state;
+            ce3.EventState = state;
         }
 
 
