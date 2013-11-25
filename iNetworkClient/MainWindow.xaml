@@ -8,7 +8,7 @@
     <Grid>
         <MediaElement Name="mediaElement" Stretch="Fill"></MediaElement>
         <Controls:SkeletonVisualizer x:Name="SkeletonViz"></Controls:SkeletonVisualizer>
-        <s:ScatterView x:Name="MainScatterView"></s:ScatterView>
+        <s:ScatterView x:Name="MainScatterView"/>
 
         <Button Width="72" Height="30" Content="Close" HorizontalAlignment="Left" VerticalAlignment="Bottom" Click="Button_Click"></Button>
         <Button Width="72" Height="30" Content="Medium" HorizontalAlignment="Center" VerticalAlignment="Bottom" Click="Button_Click"></Button>

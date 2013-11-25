@@ -33,11 +33,6 @@ namespace iNetworkClient
 
         private KinectSensor sensor;
 
-        CalendarEvent ce;
-        CalendarEvent ce1;
-        CalendarEvent ce2;
-        CalendarEvent ce3;
-
         #region iNetwork Methods
 
         private void InitializeConnection()
@@ -85,17 +80,10 @@ namespace iNetworkClient
             //InitializeConnection();
             InitializeBackgroundMovie();
 
-            ce = new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg") , DateTime.Now);
-            MainScatterView.Items.Add(ce.CreateScatterViewItem());
-
-            ce1 = new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now);
-            MainScatterView.Items.Add(ce1.CreateScatterViewItem());
-
-            ce2 = new CalendarEvent("Globalfest", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Now);
-            MainScatterView.Items.Add(ce2.CreateScatterViewItem());
-
-            ce3 = new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now);
-            MainScatterView.Items.Add(ce3.CreateScatterViewItem());
+            MainScatterView.Items.Add(new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now).CreateScatterViewItem());
+            MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now).CreateScatterViewItem());
+            MainScatterView.Items.Add(new CalendarEvent("Globalfest", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Now).CreateScatterViewItem());
+            MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now).CreateScatterViewItem());
         }
 
         private Image CreateImageFromFile(string path)
@@ -208,27 +196,43 @@ namespace iNetworkClient
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            CalendarEvent.State state = CalendarEvent.State.Close;
-
             switch (((Button)sender).Content.ToString())
             {
                 case "Close":
-                    state = CalendarEvent.State.Close;
+                    ChangeAllCalendarEventStates(CalendarEvent.State.Close);
                     break;
                 case "Medium":
-                    state = CalendarEvent.State.Medium;
+                    ChangeAllCalendarEventStates(CalendarEvent.State.Medium);
                     break;
                 case "Far":
-                    state = CalendarEvent.State.Far;
+                    ChangeAllCalendarEventStates(CalendarEvent.State.Far);
                     break;
                 default:
                     break;
             }
+        }
 
-            ce.EventState = state;
-            ce1.EventState = state;
-            ce2.EventState = state;
-            ce3.EventState = state;
+        private void ChangeAllCalendarEventStates(CalendarEvent.State state)
+        {
+            foreach (CalendarEvent ce in GetAllCalendarEvents())
+                ce.EventState = state;
+        }
+
+        private List<CalendarEvent> GetAllCalendarEvents()
+        {
+            List<CalendarEvent> list = new List<CalendarEvent>();
+
+            foreach (object o in MainScatterView.Items)
+            {
+                try
+                {
+                    CalendarEvent ce = (CalendarEvent)((ScatterViewItem)o).Content;
+                    list.Add(ce);
+                }
+                catch { }
+            }
+
+            return list;
         }
 
 
