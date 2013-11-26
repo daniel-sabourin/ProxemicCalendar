@@ -16,7 +16,12 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <controls:Panorama Title="proxemic Calendar">
+        <controls:Panorama Title="proxemic calendar">
+
+            <!--Assigns a background image to the Panorama control.-->
+            <controls:Panorama.Background>
+                <ImageBrush ImageSource="Resources/Background.png"/>
+            </controls:Panorama.Background>
 
             <!--Panorama item one-->
             <controls:PanoramaItem Header="List">
@@ -25,7 +30,17 @@
 
             <!--Panorama item two-->
             <controls:PanoramaItem Header="Add Item">
-                <Grid/>
+                <StackPanel Margin="10,0,0,0">
+                    <TextBlock Text="Event Title"></TextBlock>
+                    <TextBox></TextBox>
+
+                    <TextBlock Text="Time"></TextBlock>
+
+
+                    <TextBlock Text="Image"></TextBlock>
+                    <Image Height="250" x:Name="DisplayImage" Source="/iNetwork%20Phone%20Client1;component/Resources/Background.png"></Image>
+
+                </StackPanel>
             </controls:PanoramaItem>
         </controls:Panorama>
     </Grid>
