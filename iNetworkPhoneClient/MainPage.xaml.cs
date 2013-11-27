@@ -90,9 +90,12 @@ namespace iNetworkPhoneClient
 
             if (e.TaskResult == TaskResult.OK)
             {
+                infoText.Visibility = System.Windows.Visibility.Collapsed;
+
                 System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
                 bmp.SetSource(e.ChosenPhoto);
                 DisplayImage.Source = bmp;
+                DisplayImage.Opacity = 1;
             }
         }
 
@@ -141,20 +144,31 @@ namespace iNetworkPhoneClient
 
         private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
         {
-            System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage(new Uri("Resources/Background.png", UriKind.Relative));
+            //System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage(new Uri("Resources/Background.png", UriKind.Relative));
 
-            eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
-            eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
-            eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+            //eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+            //eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+            //eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
         }
 
         private void createButton_Click(object sender, RoutedEventArgs e)
         {
-            System.Windows.Media.ImageSource bmp = DisplayImage.Source;        
-            eventListBox.Items.Add(new EventItem(eventTitleBox.Text, DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+            DateTime dt = DateTime.Parse(datePicker.ValueString + " " + timePicker.ValueString);
 
+            System.Windows.Media.ImageSource bmp = DisplayImage.Source;
+
+            if (DisplayImage.Opacity == 0)
+                bmp = null;
+
+            eventListBox.Items.Add(new EventItem(eventTitleBox.Text, dt, bmp) { Width = eventListBox.ActualWidth });
+
+            // Clear Previous
             eventTitleBox.Text = "";
-            eventTimeBox.Text = "";
+            datePicker.Value = DateTime.Now;
+            timePicker.Value = DateTime.Now;
+
+            DisplayImage.Opacity = 0;
+            infoText.Visibility = System.Windows.Visibility.Visible;
 
             pivotControl.SelectedIndex = 0;
         }

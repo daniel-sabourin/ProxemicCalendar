@@ -22,7 +22,7 @@
                 <ImageBrush ImageSource="Resources/Background.png" Stretch="UniformToFill" />
             </controls:Pivot.Background>
             
-            <controls:PivotItem Header="List">
+            <controls:PivotItem Header="Events">
                 <ListBox Name="eventListBox" SelectionChanged="eventListBox_SelectionChanged">
                     
                 </ListBox>
@@ -35,15 +35,24 @@
                     <TextBox Name="eventTitleBox"></TextBox>
 
                     <TextBlock Text="Time" Margin="0,10,0,0"></TextBlock>
-                    <TextBox Name="eventTimeBox"></TextBox>
 
-                    <toolkit:DatePicker></toolkit:DatePicker>
-                    
+                    <Grid>
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50*"></ColumnDefinition>
+                            <ColumnDefinition Width="50*"></ColumnDefinition>
+                        </Grid.ColumnDefinitions>
+                        
+                        <toolkit:DatePicker Grid.Column="0" Name="datePicker"></toolkit:DatePicker>
+                        <toolkit:TimePicker Grid.Column="1" Name="timePicker"></toolkit:TimePicker>
+                    </Grid>
+                   
                     <TextBlock Text="Image" Margin="0,10,0,0"></TextBlock>
 
                     <Grid Height="250" Margin="10,10,10,0">
-                        <Image Height="250" x:Name="DisplayImage" Source="/iNetwork%20Phone%20Client1;component/Resources/Background.png" Tap="DisplayImage_Tap"></Image>
-
+                        <Image Height="250" x:Name="DisplayImage" Tap="DisplayImage_Tap" Source="/iNetwork%20Phone%20Client1;component/Resources/Background.png" Opacity="0"></Image>
+                        <TextBlock Text="Tap to add Image" HorizontalAlignment="Center" Tap="DisplayImage_Tap" VerticalAlignment="Center" Margin="0,0,0,100" Name="infoText"></TextBlock>
+                        
                         <Button Height="75" Width="75" Margin="0,0,100,0" Name="cameraButton" Click="cameraButton_Click" Visibility="Collapsed">
                             <Button.Background>
                                 <ImageBrush ImageSource="/iNetwork%20Phone%20Client1;component/Resources/appbar.feature.camera.rest.png" Stretch="None" />
