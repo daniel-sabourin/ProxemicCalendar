@@ -95,8 +95,6 @@ namespace iNetworkPhoneClient
 
             if (e.TaskResult == TaskResult.OK)
             {
-                //MessageBox.Show(e.ChosenPhoto.Length.ToString());
-
                 //Code to display the photo on the page in an image control named myImage.
                 System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
                 bmp.SetSource(e.ChosenPhoto);
@@ -118,6 +116,43 @@ namespace iNetworkPhoneClient
         private void galleryButton_Click(object sender, RoutedEventArgs e)
         {
             photoChooserTask.Show();
+        }
+
+        private void eventListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            foreach (object o in e.AddedItems)
+            {
+                EventItem ei = (EventItem)o;
+                ei.Selected();
+            }
+
+            foreach (object o in e.RemovedItems)
+            {
+                EventItem ei2 = (EventItem)o;
+                ei2.Deselected();
+            }
+
+
+        }
+
+        private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage(new Uri("Resources/Background.png", UriKind.Relative));
+
+            eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+            eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+            eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+        }
+
+        private void createButton_Click(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Media.ImageSource bmp = DisplayImage.Source;        
+            eventListBox.Items.Add(new EventItem(eventTitleBox.Text, DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
+
+            eventTitleBox.Text = "";
+            eventTimeBox.Text = "";
+
+            pivotControl.SelectedIndex = 0;
         }
 
     }
