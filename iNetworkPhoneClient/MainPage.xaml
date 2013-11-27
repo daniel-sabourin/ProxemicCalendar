@@ -38,7 +38,22 @@
 
 
                     <TextBlock Text="Image"></TextBlock>
-                    <Image Height="250" x:Name="DisplayImage" Source="/iNetwork%20Phone%20Client1;component/Resources/Background.png"></Image>
+                    
+                    <Grid Height="250">
+                        <Image Height="250" x:Name="DisplayImage" Source="/iNetwork%20Phone%20Client1;component/Resources/Background.png" Tap="DisplayImage_Tap"></Image>
+
+                        <Button Height="75" Width="75" Margin="0,0,100,0" Name="cameraButton" Click="cameraButton_Click">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/iNetwork%20Phone%20Client1;component/Resources/appbar.feature.camera.rest.png" Stretch="None" />
+                            </Button.Background>
+                        </Button>
+                        <Button Height="75" Width="75" Margin="100,0,0,0" Name="galleryButton" Click="galleryButton_Click">
+                            <Button.Background>
+                                <ImageBrush ImageSource="/iNetwork%20Phone%20Client1;component/Resources/appbar.folder.rest.png" Stretch="None" />
+                            </Button.Background>
+                        </Button>
+
+                    </Grid>
 
                 </StackPanel>
             </controls:PanoramaItem>

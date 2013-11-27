@@ -26,6 +26,7 @@ namespace iNetworkPhoneClient
         private int _port = 12345;
 
         PhotoChooserTask photoChooserTask;
+        CameraCaptureTask cameraCaptureTask;
 
         #region iNetwork Methods
 
@@ -78,28 +79,45 @@ namespace iNetworkPhoneClient
             photoChooserTask = new PhotoChooserTask();
             photoChooserTask.Completed += new EventHandler<PhotoResult>(photoChooserTask_Completed);
 
+            cameraCaptureTask = new CameraCaptureTask();
+            cameraCaptureTask.Completed += new EventHandler<PhotoResult>(photoChooserTask_Completed);
+
             // to send a message 
             // Message msg = new Message("Name-of-Message");
             // msg.AddField("Name-of-Field", 0);
             // this._connection.SendMessage(msg);
         }
 
-        private void Image_Tap(object sender, GestureEventArgs e)
-        {
-            photoChooserTask.Show();
-        }
-
         void photoChooserTask_Completed(object sender, PhotoResult e)
         {
+            cameraButton.Visibility = System.Windows.Visibility.Collapsed;
+            galleryButton.Visibility = System.Windows.Visibility.Collapsed;
+
             if (e.TaskResult == TaskResult.OK)
             {
-                MessageBox.Show(e.ChosenPhoto.Length.ToString());
+                //MessageBox.Show(e.ChosenPhoto.Length.ToString());
 
                 //Code to display the photo on the page in an image control named myImage.
-                //System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
-                //bmp.SetSource(e.ChosenPhoto);
-                //myImage.Source = bmp;
+                System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
+                bmp.SetSource(e.ChosenPhoto);
+                DisplayImage.Source = bmp;
             }
+        }
+
+        private void DisplayImage_Tap(object sender, GestureEventArgs e)
+        {
+            cameraButton.Visibility = System.Windows.Visibility.Visible;
+            galleryButton.Visibility = System.Windows.Visibility.Visible;
+        }
+
+        private void cameraButton_Click(object sender, RoutedEventArgs e)
+        {
+            cameraCaptureTask.Show();
+        }
+
+        private void galleryButton_Click(object sender, RoutedEventArgs e)
+        {
+            photoChooserTask.Show();
         }
 
     }
