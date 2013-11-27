@@ -22,7 +22,7 @@ namespace iNetworkPhoneClient
     {
 
         private Connection _connection;
-        private string _ipAddress = "192.168.1.98";
+        private string _ipAddress = "10.11.94.40";
         private int _port = 12345;
 
         PhotoChooserTask photoChooserTask;
@@ -97,7 +97,7 @@ namespace iNetworkPhoneClient
         }
 
 
-        private void DisplayImage_Tap(object sender, GestureEventArgs e)
+        private void DisplayImage_Tap(object sender, System.Windows.Input.GestureEventArgs e)
         {
             cameraButton.Visibility = System.Windows.Visibility.Visible;
             galleryButton.Visibility = System.Windows.Visibility.Visible;

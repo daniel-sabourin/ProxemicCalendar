@@ -6,6 +6,7 @@
     xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
     xmlns:controls="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
     FontFamily="{StaticResource PhoneFontFamilyNormal}"
@@ -36,6 +37,8 @@
                     <TextBlock Text="Time" Margin="0,10,0,0"></TextBlock>
                     <TextBox Name="eventTimeBox"></TextBox>
 
+                    <toolkit:DatePicker></toolkit:DatePicker>
+                    
                     <TextBlock Text="Image" Margin="0,10,0,0"></TextBlock>
 
                     <Grid Height="250" Margin="10,10,10,0">
