@@ -97,11 +97,11 @@ namespace iNetworkServer
                                     // don't do anything
                                     break;
                                 // add cases with the message names
-                                case "Name-of-Message":
+                                case "EventItem":
                                     // broadcast to all
                                     // this._server.BroadcastMessage(msg);
                                     // broadcast to all but server
-                                    // this._server.BroadcastMessage(msg, (Connection)sender);
+                                    this._server.BroadcastMessage(msg, (Connection)sender);
                                     break;
                             }
                         }

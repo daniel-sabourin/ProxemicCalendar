@@ -32,5 +32,21 @@ namespace iNetworkPhoneClient
         {
             LayoutRoot.Background = new SolidColorBrush(Colors.Transparent);
         }
+
+        public TransferableEvent CreateTransferableEvent()
+        {
+            return new TransferableEvent(eventName.Text, eventTime.Text, ToByteArray(eventImage));
+        }
+
+        public static byte[] ToByteArray(Image source)
+        {
+            WriteableBitmap bmp = new WriteableBitmap(source, null);
+            int[] p = bmp.Pixels;
+            int len = p.Length * 4;
+            byte[] result = new byte[len]; // ARGB
+            Buffer.BlockCopy(p, 0, result, 0, len);
+            return result;
+        }
+
     }
 }

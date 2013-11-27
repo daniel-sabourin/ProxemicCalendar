@@ -50,26 +50,33 @@ namespace iNetworkClient
 
         private void OnMessageReceived(object sender, Message msg)
         {
-            try
+            this.Dispatcher.Invoke(new Action(delegate()
             {
-                if (msg != null)
+                try
                 {
-                    switch (msg.Name)
+                    if (msg != null)
                     {
-                        default:
-                            // don't do anything
-                            break;
-                        case "Name-of-Message":
-                            // do something here
-                            break;
+                        switch (msg.Name)
+                        {
+                            default:
+                                // don't do anything
+                                break;
+                            case "EventItem":
+                                // do something here
+                                TransferableEvent tEvent = msg.GetField("eventItem", typeof(TransferableEvent)) as TransferableEvent;
 
+                                MainScatterView.Items.Add(new CalendarEvent(tEvent.EventName, CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now).CreateScatterViewItem());
+
+                                break;
+
+                        }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + "\n" + e.StackTrace);
-            }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                }
+            }));
 
         }
         #endregion
@@ -77,7 +84,7 @@ namespace iNetworkClient
         public MainWindow()
         {
             InitializeComponent();
-            //InitializeConnection();
+            InitializeConnection();
             InitializeBackgroundMovie();
 
             MainScatterView.Items.Add(new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now).CreateScatterViewItem());

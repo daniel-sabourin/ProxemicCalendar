@@ -22,7 +22,7 @@ namespace iNetworkPhoneClient
     {
 
         private Connection _connection;
-        private string _ipAddress = "127.0.0.1";
+        private string _ipAddress = "192.168.1.98";
         private int _port = 12345;
 
         PhotoChooserTask photoChooserTask;
@@ -81,11 +81,6 @@ namespace iNetworkPhoneClient
 
             cameraCaptureTask = new CameraCaptureTask();
             cameraCaptureTask.Completed += new EventHandler<PhotoResult>(photoChooserTask_Completed);
-
-            // to send a message 
-            // Message msg = new Message("Name-of-Message");
-            // msg.AddField("Name-of-Field", 0);
-            // this._connection.SendMessage(msg);
         }
 
         void photoChooserTask_Completed(object sender, PhotoResult e)
@@ -95,12 +90,12 @@ namespace iNetworkPhoneClient
 
             if (e.TaskResult == TaskResult.OK)
             {
-                //Code to display the photo on the page in an image control named myImage.
                 System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage();
                 bmp.SetSource(e.ChosenPhoto);
                 DisplayImage.Source = bmp;
             }
         }
+
 
         private void DisplayImage_Tap(object sender, GestureEventArgs e)
         {
@@ -118,12 +113,21 @@ namespace iNetworkPhoneClient
             photoChooserTask.Show();
         }
 
+        public void SendItem(EventItem ei)
+        {
+            Message message = new Message("EventItem");
+            message.AddField("eventItem", ei.CreateTransferableEvent());
+            _connection.SendMessage(message);
+        }
+
         private void eventListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             foreach (object o in e.AddedItems)
             {
                 EventItem ei = (EventItem)o;
                 ei.Selected();
+
+                SendItem(ei);
             }
 
             foreach (object o in e.RemovedItems)

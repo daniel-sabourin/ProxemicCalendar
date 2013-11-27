@@ -69,6 +69,7 @@
     <Compile Include="SkeletonVisualizer.xaml.cs">
       <DependentUpon>SkeletonVisualizer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TransferableEvent.cs" />
     <Page Include="CalendarEvent.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
