@@ -16,17 +16,21 @@ using Microsoft.Phone.Tasks;
 using GroupLab.iNetwork;
 using GroupLab.iNetwork.Tcp;
 
+
 namespace iNetworkPhoneClient
 {
     public partial class MainPage : PhoneApplicationPage
     {
 
         private Connection _connection;
-        private string _ipAddress = "10.11.94.40";
+        private string _ipAddress = "192.168.1.98";
         private int _port = 12345;
 
         PhotoChooserTask photoChooserTask;
         CameraCaptureTask cameraCaptureTask;
+
+        TextBlock emptyMessage = new TextBlock() { Text = "There doesn't seem to be anything here" };
+
 
         #region iNetwork Methods
 
@@ -175,6 +179,19 @@ namespace iNetworkPhoneClient
 
             pivotControl.SelectedIndex = 0;
         }
+
+        private void eventListBox_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (eventListBox.Items.Count == 0)
+            {
+                eventListBox.Items.Add(emptyMessage);
+            }
+            else if (eventListBox.Items.Count > 1 && eventListBox.Items.Contains(emptyMessage))
+            {
+                eventListBox.Items.Remove(emptyMessage);
+            }
+        }
+
 
     }
 }

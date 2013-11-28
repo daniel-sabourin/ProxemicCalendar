@@ -23,7 +23,7 @@
             </controls:Pivot.Background>
             
             <controls:PivotItem Header="Events">
-                <ListBox Name="eventListBox" SelectionChanged="eventListBox_SelectionChanged">
+                <ListBox Name="eventListBox" SelectionChanged="eventListBox_SelectionChanged" LayoutUpdated="eventListBox_LayoutUpdated">
                     
                 </ListBox>
                 
