@@ -87,6 +87,9 @@ namespace iNetworkPhoneClient
         {
             cameraButton.Visibility = System.Windows.Visibility.Collapsed;
             galleryButton.Visibility = System.Windows.Visibility.Collapsed;
+            
+            // Connection gets dropped when you enter camera/photo chooser
+            InitializeConnection();
 
             if (e.TaskResult == TaskResult.OK)
             {
