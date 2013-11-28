@@ -33,6 +33,44 @@ namespace iNetworkClient
 
         private KinectSensor sensor;
 
+        private float _playerDepth;
+
+        public float PlayerDepth
+        {
+            get { return _playerDepth; }
+            set
+            {
+                _playerDepth = value;
+
+                if (value > 3.5)
+                    PlayerState = CalendarEvent.State.Far;
+                else if (value <= 3.5 && value >= 1.5)
+                    PlayerState = CalendarEvent.State.Medium;
+                else if (value < 1.5)
+                    PlayerState = CalendarEvent.State.Close;
+            }
+        }
+
+        private CalendarEvent.State _playerState;
+
+        public CalendarEvent.State PlayerState
+        {
+            get { return _playerState; }
+            set
+            {
+                if (PlayerState != value)
+                {
+                    _playerState = value;
+                    //Console.WriteLine(value);
+
+                    ChangeAllCalendarEventStates(value);
+                }
+
+
+            }
+        }
+
+
         #region iNetwork Methods
 
         private void InitializeConnection()
@@ -154,8 +192,17 @@ namespace iNetworkClient
 
             if (null != this.sensor)
             {
+                TransformSmoothParameters parameters = new TransformSmoothParameters
+                {
+                    Smoothing = 0.7f,
+                    Correction = 0.3f,
+                    Prediction = 0.4f,
+                    JitterRadius = 1.0f,
+                    MaxDeviationRadius = 0.5f
+                };
+
                 // Turn on the skeleton stream to receive skeleton frames
-                this.sensor.SkeletonStream.Enable();
+                this.sensor.SkeletonStream.Enable(parameters);
 
                 // Add an event handler to be called whenever there is new color frame data
                 this.sensor.SkeletonFrameReady += this.SensorSkeletonFrameReady;
@@ -199,6 +246,22 @@ namespace iNetworkClient
             }
 
             SkeletonViz.DrawSkeletons(skeletons);
+
+            if (sensor.SkeletonStream.TrackingMode == SkeletonTrackingMode.Default)
+            {
+                Skeleton playerSkeleton = (from s in skeletons where s.TrackingState == SkeletonTrackingState.Tracked select s).FirstOrDefault();
+
+                if (playerSkeleton != null)
+                {
+                    Joint j = playerSkeleton.Joints[JointType.ShoulderCenter];
+
+                    PlayerDepth = j.Position.Z;
+                }
+                else
+                {
+                    PlayerDepth = 9001;
+                }
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
