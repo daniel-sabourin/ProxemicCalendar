@@ -15,17 +15,21 @@
         
         <Ellipse Fill="Black" Opacity="0.2" Name="blackBackgroundEllipse"></Ellipse>
 
-            <Label x:Name="textLabel" FontSize="40" Content="Hello" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" FontFamily="Roboto" Margin="3,0" HorizontalContentAlignment="Center" Opacity="0">
+        <StackPanel VerticalAlignment="Center">
+            <Label x:Name="textLabel" FontSize="40" Content="Hello" HorizontalAlignment="Stretch" Foreground="White" FontFamily="Roboto" Margin="3,0" HorizontalContentAlignment="Center" Opacity="0">
                 <Label.Effect>
                     <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.75" BlurRadius="5"/>
                 </Label.Effect>
             </Label>
 
-        <Label x:Name="timeLabel" FontSize="20" Content="Time here" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" FontFamily="Roboto" Margin="3,90,3,0" HorizontalContentAlignment="Center" Opacity="0">
-            <Label.Effect>
-                <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.75" BlurRadius="5"/>
-            </Label.Effect>
-        </Label>
+            <Label x:Name="timeLabel" FontSize="20" Content="Time here" HorizontalAlignment="Stretch" VerticalAlignment="Center" Foreground="White" FontFamily="Roboto" Margin="3,0,3,0" HorizontalContentAlignment="Center" Opacity="0">
+                <Label.Effect>
+                    <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.75" BlurRadius="5"/>
+                </Label.Effect>
+            </Label>
+
+        </StackPanel>
+
 
     </Grid>
 </UserControl>
