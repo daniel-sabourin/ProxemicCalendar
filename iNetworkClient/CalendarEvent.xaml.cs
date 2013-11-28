@@ -70,6 +70,8 @@ namespace iNetworkClient
             set
             {
                 _date = value;
+
+                timeLabel.Content = value.ToString();
             }
         }
 
@@ -104,7 +106,7 @@ namespace iNetworkClient
             return svi;
         }
 
-        private double CalculateFontSize()
+        private double CalculateFontSize(Label textLabel)
         {
             // Very bad algorithm!
             for (int i = 12; i < 150; i++)
@@ -138,7 +140,7 @@ namespace iNetworkClient
 
         private void ResizeFont()
         {
-            double fontSize = CalculateFontSize();
+            double fontSize = CalculateFontSize(textLabel);
             textLabel.FontSize = fontSize;
         }
 
@@ -147,6 +149,13 @@ namespace iNetworkClient
             switch (state)
             {
                 case State.Close:
+                    DoubleAnimation backgroundAnimation2 = new DoubleAnimation(blackBackgroundEllipse.Opacity, BlackBackgroundOpacityMax, FadeDuration);
+                    DoubleAnimation textAnimation2 = new DoubleAnimation(textLabel.Opacity, 1, FadeDuration);
+                    DoubleAnimation dateAnimation2 = new DoubleAnimation(timeLabel.Opacity, 1, FadeDuration);
+                    timeLabel.BeginAnimation(Label.OpacityProperty, dateAnimation2);
+                    textLabel.BeginAnimation(Label.OpacityProperty, textAnimation2);
+                    blackBackgroundEllipse.BeginAnimation(Ellipse.OpacityProperty, backgroundAnimation2);
+
                     break;
                 case State.Medium:
 
@@ -155,12 +164,18 @@ namespace iNetworkClient
                     textLabel.BeginAnimation(Label.OpacityProperty, textAnimation);
                     blackBackgroundEllipse.BeginAnimation(Ellipse.OpacityProperty, backgroundAnimation);
 
+                    DoubleAnimation dateAnimation = new DoubleAnimation(timeLabel.Opacity, 0, FadeDuration);
+                    timeLabel.BeginAnimation(Label.OpacityProperty, dateAnimation);
+
                     break;
                 case State.Far:
                     DoubleAnimation backgroundAnimation1 = new DoubleAnimation(blackBackgroundEllipse.Opacity, BlackBackgroundOpacityMin, FadeDuration);
                     DoubleAnimation textAnimation1 = new DoubleAnimation(textLabel.Opacity, 0, FadeDuration);
                     textLabel.BeginAnimation(Label.OpacityProperty, textAnimation1);
                     blackBackgroundEllipse.BeginAnimation(Ellipse.OpacityProperty, backgroundAnimation1);
+
+                    DoubleAnimation dateAnimation1 = new DoubleAnimation(timeLabel.Opacity, 0, FadeDuration);
+                    timeLabel.BeginAnimation(Label.OpacityProperty, dateAnimation1);
 
                     break;
                 default:
