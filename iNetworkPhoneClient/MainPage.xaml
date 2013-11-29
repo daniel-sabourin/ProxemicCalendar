@@ -17,7 +17,7 @@
 
     <!--LayoutRoot contains the root grid where all other page content is placed-->
     <Grid x:Name="LayoutRoot">
-        <controls:Pivot Title="proxemic calendar" Name="pivotControl">
+        <controls:Pivot Title="proxemic calendar" Name="pivotControl" SelectionChanged="pivotControl_SelectionChanged">
             <controls:Pivot.Background>
                 <ImageBrush ImageSource="Resources/Background.png" Stretch="UniformToFill" />
             </controls:Pivot.Background>
@@ -51,14 +51,14 @@
 
                     <Grid Height="250" Margin="10,10,10,0">
                         <Image Height="250" x:Name="DisplayImage" Tap="DisplayImage_Tap" Source="/iNetwork%20Phone%20Client1;component/Resources/Background.png" Opacity="0"></Image>
-                        <TextBlock Text="Tap to add Image" HorizontalAlignment="Center" Tap="DisplayImage_Tap" VerticalAlignment="Center" Margin="0,0,0,100" Name="infoText"></TextBlock>
+                        <TextBlock Text="Tap to add an Image" HorizontalAlignment="Center" Tap="DisplayImage_Tap" VerticalAlignment="Center" Margin="0,0,0,100" Name="infoText"></TextBlock>
                         
-                        <Button Height="75" Width="75" Margin="0,0,100,0" Name="cameraButton" Click="cameraButton_Click" Visibility="Collapsed">
+                        <Button Height="75" Width="75" Margin="0,25,100,0" Name="cameraButton" Click="cameraButton_Click" Opacity="0" Visibility="Collapsed">
                             <Button.Background>
                                 <ImageBrush ImageSource="/iNetwork%20Phone%20Client1;component/Resources/appbar.feature.camera.rest.png" Stretch="None" />
                             </Button.Background>
                         </Button>
-                        <Button Height="75" Width="75" Margin="100,0,0,0" Name="galleryButton" Click="galleryButton_Click" Visibility="Collapsed">
+                        <Button Height="75" Width="75" Margin="100,25,0,0" Name="galleryButton" Click="galleryButton_Click" Opacity="0" Visibility="Collapsed">
                             <Button.Background>
                                 <ImageBrush ImageSource="/iNetwork%20Phone%20Client1;component/Resources/appbar.folder.rest.png" Stretch="None" />
                             </Button.Background>
