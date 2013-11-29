@@ -14,6 +14,7 @@ using System.Windows.Shapes;
 using Microsoft.Surface.Presentation.Controls;
 using System.Globalization;
 using System.Windows.Media.Animation;
+using System.IO;
 
 namespace iNetworkClient
 {
@@ -25,7 +26,6 @@ namespace iNetworkClient
         public const double BlackBackgroundOpacityMax = 0.55;
         public const double BlackBackgroundOpacityMin = 0.2;
         public TimeSpan FadeDuration = TimeSpan.FromSeconds(1);
-
 
         public enum State { Close, Medium, Far };
         private State _eventState = State.Far;
@@ -83,6 +83,15 @@ namespace iNetworkClient
             EventName = name;
             Image = image;
             Date = date;
+        }
+
+        public CalendarEvent(TransferableEvent tEvent)
+        {
+            InitializeComponent();
+
+            EventName = tEvent.EventName;
+            Image = new Image() { Source = LoadImage(tEvent.EventImage) };
+            Date = DateTime.Now;
         }
 
         public ScatterViewItem CreateScatterViewItem()
@@ -144,6 +153,40 @@ namespace iNetworkClient
             textLabel.FontSize = fontSize;
         }
 
+        private BitmapImage LoadImage(byte[] imageData)
+        {
+            if (imageData == null || imageData.Length == 0) return null;
+            var image = new BitmapImage();
+            using (var mem = new MemoryStream(imageData))
+            {
+                mem.Position = 0;
+                image.BeginInit();
+                image.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.UriSource = null;
+                image.StreamSource = mem;
+                image.EndInit();
+            }
+            image.Freeze();
+            return image;
+        }
+
+        private byte[] sourceToByteArray(BitmapSource bs)
+        {
+            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(bs));
+            encoder.QualityLevel = 25;
+            byte[] ba = new byte[0];
+            using (MemoryStream stream = new MemoryStream())
+            {
+                encoder.Frames.Add(BitmapFrame.Create(bs));
+                encoder.Save(stream);
+                ba = stream.ToArray();
+                stream.Close();
+            }
+            return ba;
+        }
+
         private void AnimateToState(State state)
         {
             switch (state)
@@ -181,6 +224,11 @@ namespace iNetworkClient
                 default:
                     break;
             }
+        }
+
+        public TransferableEvent CreateTransferableEvent()
+        {
+            return new TransferableEvent(EventName, Date.ToString() , sourceToByteArray(Image.Source as BitmapSource));
         }
     }
 }

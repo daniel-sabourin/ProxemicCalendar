@@ -10,8 +10,7 @@
         <Controls:SkeletonVisualizer x:Name="SkeletonViz" Opacity="0.75"></Controls:SkeletonVisualizer>
         <s:ScatterView x:Name="MainScatterView"/>
         
-        <Canvas>
-            <Ellipse Width="10" Height="10" Name="leftEllipse" Fill="Red" Opacity="0"></Ellipse>
+        <Canvas Name="dotCanvas">
             <Ellipse Width="10" Height="10" Name="rightEllipse" Fill="Red" Opacity="0"></Ellipse>
 
         </Canvas>

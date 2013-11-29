@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
+using System.IO;
 
 namespace iNetworkPhoneClient
 {
@@ -24,6 +25,20 @@ namespace iNetworkPhoneClient
             eventImage.Source = bmp;
         }
 
+        public EventItem(TransferableEvent tEvent)
+        {
+            InitializeComponent();
+
+            eventName.Text = tEvent.EventName;
+            eventTime.Text = DateTime.Now.ToString();
+
+            BitmapImage bitmapimage = new BitmapImage();
+            MemoryStream stream = new MemoryStream(tEvent.EventImage);
+            bitmapimage.SetSource(stream);
+
+            eventImage.Source = bitmapimage;
+        }
+
         public void Selected()
         {
             LayoutRoot.Background = new SolidColorBrush(Color.FromArgb(90, 255, 255, 255));
@@ -36,17 +51,27 @@ namespace iNetworkPhoneClient
 
         public TransferableEvent CreateTransferableEvent()
         {
-            return new TransferableEvent(eventName.Text, eventTime.Text, ToByteArray(eventImage));
+            return new TransferableEvent(eventName.Text, eventTime.Text, sourceToByteArray(eventImage.Source as BitmapSource));
         }
 
-        public static byte[] ToByteArray(Image source)
+        private static byte[] sourceToByteArray(BitmapSource bs)
         {
-            WriteableBitmap bmp = new WriteableBitmap(source, null);
-            int[] p = bmp.Pixels;
-            int len = p.Length * 4;
-            byte[] result = new byte[len]; // ARGB
-            Buffer.BlockCopy(p, 0, result, 0, len);
-            return result;
+            try
+            {
+                BitmapImage bitmapImage = (BitmapImage)bs;
+                byte[] data;
+                WriteableBitmap wb = new WriteableBitmap(bitmapImage);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    wb.SaveJpeg(ms, bitmapImage.PixelHeight, bitmapImage.PixelWidth, 0, 100);
+                    data = ms.ToArray();
+                }
+                return data;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
     }

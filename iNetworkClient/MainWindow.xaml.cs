@@ -21,6 +21,7 @@ using Microsoft.Surface.Presentation.Controls;
 using System.Globalization;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
+using System.Timers;
 
 
 namespace iNetworkClient
@@ -35,6 +36,9 @@ namespace iNetworkClient
         private int _port = 12345;
 
         private KinectSensor sensor;
+
+        private ScatterViewItem HoveredItem;
+        private Timer HoverTimer;
 
         private float _playerDepth;
 
@@ -69,7 +73,6 @@ namespace iNetworkClient
 
                     if (value == CalendarEvent.State.Medium || value == CalendarEvent.State.Close)
                     {
-                        leftEllipse.Opacity = 1;
                         rightEllipse.Opacity = 1;
 
                         int cellSize = 286;
@@ -92,8 +95,9 @@ namespace iNetworkClient
                     }
                     else
                     {
-                        leftEllipse.Opacity = 0;
                         rightEllipse.Opacity = 0;
+                        Canvas.SetLeft(rightEllipse, 0);
+                        Canvas.SetTop(rightEllipse, 0);
                     }
 
                     if (value == CalendarEvent.State.Close)
@@ -149,7 +153,12 @@ namespace iNetworkClient
                                 // do something here
                                 TransferableEvent tEvent = msg.GetField("eventItem", typeof(TransferableEvent)) as TransferableEvent;
 
-                                MainScatterView.Items.Add(new CalendarEvent(tEvent.EventName, CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now).CreateScatterViewItem());
+                                //DateTime dt = DateTime.Parse(tEvent.EventTime);
+
+                                CalendarEvent ce = new CalendarEvent(tEvent) { EventState = PlayerState };
+                                ScatterViewItem svi = ce.CreateScatterViewItem();
+
+                                MainScatterView.Items.Add(svi);
 
                                 break;
 
@@ -165,11 +174,24 @@ namespace iNetworkClient
         }
         #endregion
 
+
+
         public MainWindow()
         {
             InitializeComponent();
             InitializeConnection();
             InitializeBackgroundMovie();
+
+            HoverTimer = new Timer();
+            HoverTimer.Interval = 2000;
+            HoverTimer.AutoReset = false;
+            HoverTimer.Elapsed += delegate(object source, ElapsedEventArgs timerE)
+            {
+                this.Dispatcher.Invoke(new Action(delegate()
+                {
+                    SendItem(HoveredItem);
+                }));
+            };
 
             MainScatterView.Items.Add(new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now).CreateScatterViewItem());
@@ -300,21 +322,37 @@ namespace iNetworkClient
                 if (playerSkeleton != null)
                 {
                     Joint j = playerSkeleton.Joints[JointType.ShoulderCenter];
-
                     PlayerDepth = j.Position.Z;
 
-                    Joint leftHand = playerSkeleton.Joints[JointType.HandLeft];
-                    Joint leftPoint = SkeletalExtensions.ScaleTo(leftHand, 1024, 768);
-
-                    leftEllipse.SetValue(Canvas.TopProperty, leftPoint.Position.Y);
-                    leftEllipse.SetValue(Canvas.LeftProperty, leftPoint.Position.X);
+                    //Joint leftHand = playerSkeleton.Joints[JointType.HandLeft];
+                    //Joint leftPoint = SkeletalExtensions.ScaleTo(leftHand, (int)SkeletonViz.ActualWidth, (int)SkeletonViz.ActualHeight);
+                    //Canvas.SetLeft(leftEllipse, leftPoint.Position.X);
+                    //Canvas.SetTop(leftEllipse, leftPoint.Position.Y);
 
                     Joint rightHand = playerSkeleton.Joints[JointType.HandRight];
-                    Joint rightPoint = SkeletalExtensions.ScaleTo(rightHand, 1024, 768);
+                    Joint rightPoint = SkeletalExtensions.ScaleTo(rightHand, (int)SkeletonViz.ActualWidth, (int)SkeletonViz.ActualHeight);
 
-                    rightEllipse.SetValue(Canvas.TopProperty, rightPoint.Position.Y);
-                    rightEllipse.SetValue(Canvas.LeftProperty, rightPoint.Position.X);
+                    Canvas.SetLeft(rightEllipse, rightPoint.Position.X);
+                    Canvas.SetTop(rightEllipse, rightPoint.Position.Y);
 
+                    DependencyObject sa = MainScatterView.InputHitTest(new Point(rightPoint.Position.X, rightPoint.Position.Y)) as DependencyObject;
+
+                    while (sa != null && sa.GetType() != typeof(ScatterViewItem))
+                        sa = VisualTreeHelper.GetParent(sa);
+
+                    if (sa != null)
+                    {
+                        if (HoveredItem == null)
+                        {
+                            HoveredItem = (ScatterViewItem)sa; 
+                            HoverTimer.Start();
+                        }
+                    }
+                    else
+                    {
+                        HoveredItem = null;
+                        HoverTimer.Stop();
+                    }
                 }
                 else
                 {
@@ -322,6 +360,8 @@ namespace iNetworkClient
                 }
             }
         }
+
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -385,8 +425,7 @@ namespace iNetworkClient
         private void SendItem(ScatterViewItem svi)
         {
             CalendarEvent ce = (CalendarEvent)(svi.Content);
-
-            TransferableEvent te = new TransferableEvent(ce.EventName, ce.Date.ToString(), null);
+            TransferableEvent te = ce.CreateTransferableEvent();
 
             Message message = new Message("EventItem");
             message.AddField("eventItem", te);

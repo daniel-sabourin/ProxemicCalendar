@@ -15,6 +15,8 @@ using Microsoft.Phone.Tasks;
 
 using GroupLab.iNetwork;
 using GroupLab.iNetwork.Tcp;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 
 namespace iNetworkPhoneClient
@@ -63,7 +65,7 @@ namespace iNetworkPhoneClient
                             case "EventItem":
                                 // do something here
                                 TransferableEvent tEvent = msg.GetField("eventItem", typeof(TransferableEvent)) as TransferableEvent;
-                                eventListBox.Items.Add(new EventItem(tEvent.EventName, DateTime.Now, null) { Width = eventListBox.ActualWidth });
+                                eventListBox.Items.Add(new EventItem(tEvent) { Width = eventListBox.ActualWidth });
 
                                 break;
 
@@ -151,16 +153,6 @@ namespace iNetworkPhoneClient
                 ei2.Deselected();
             }
 
-
-        }
-
-        private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
-        {
-            //System.Windows.Media.Imaging.BitmapImage bmp = new System.Windows.Media.Imaging.BitmapImage(new Uri("Resources/Background.png", UriKind.Relative));
-
-            //eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
-            //eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
-            //eventListBox.Items.Add(new EventItem("Doctor", DateTime.Now, bmp) { Width = eventListBox.ActualWidth });
         }
 
         private void createButton_Click(object sender, RoutedEventArgs e)
