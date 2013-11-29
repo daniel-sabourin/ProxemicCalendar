@@ -18,6 +18,9 @@ using GroupLab.iNetwork;
 using GroupLab.iNetwork.Tcp;
 using System.IO;
 using Microsoft.Surface.Presentation.Controls;
+using System.Globalization;
+using System.Windows.Threading;
+using System.Windows.Media.Animation;
 
 
 namespace iNetworkClient
@@ -61,12 +64,55 @@ namespace iNetworkClient
                 if (PlayerState != value)
                 {
                     _playerState = value;
-                    //Console.WriteLine(value);
 
                     ChangeAllCalendarEventStates(value);
+
+                    if (value == CalendarEvent.State.Medium || value == CalendarEvent.State.Close)
+                    {
+                        leftEllipse.Opacity = 1;
+                        rightEllipse.Opacity = 1;
+
+                        int cellSize = 286;
+
+                        int numberOfRows = (int)MainScatterView.ActualHeight / cellSize;
+                        int numberOfCols = (int)MainScatterView.ActualWidth / cellSize;
+
+                        for (int i = 0; i < MainScatterView.Items.Count; i++)
+                        {
+                            int rowPos = i / numberOfCols;
+                            int colPos = i % numberOfCols;
+
+                            int x = cellSize * colPos + (cellSize / 2);
+                            int y = cellSize * rowPos + (cellSize / 2);
+
+                            ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[i];
+                            AnimateScatterViewToPoint(svi, new Point(x, y));
+
+                        }
+                    }
+                    else
+                    {
+                        leftEllipse.Opacity = 0;
+                        rightEllipse.Opacity = 0;
+                    }
+
+                    if (value == CalendarEvent.State.Close)
+                    {
+                        DoubleAnimation skelAnimation = new DoubleAnimation();
+                        skelAnimation.From = SkeletonViz.Opacity;
+                        skelAnimation.To = 0.4;
+                        skelAnimation.Duration = TimeSpan.FromSeconds(1);
+                        SkeletonViz.BeginAnimation(SkeletonVisualizer.OpacityProperty, skelAnimation);
+                    }
+                    else
+                    {
+                        DoubleAnimation skelAnimation = new DoubleAnimation();
+                        skelAnimation.From = SkeletonViz.Opacity;
+                        skelAnimation.To = 0.75;
+                        skelAnimation.Duration = TimeSpan.FromSeconds(1);
+                        SkeletonViz.BeginAnimation(SkeletonVisualizer.OpacityProperty, skelAnimation);
+                    }
                 }
-
-
             }
         }
 
@@ -256,6 +302,19 @@ namespace iNetworkClient
                     Joint j = playerSkeleton.Joints[JointType.ShoulderCenter];
 
                     PlayerDepth = j.Position.Z;
+
+                    Joint leftHand = playerSkeleton.Joints[JointType.HandLeft];
+                    Joint leftPoint = SkeletalExtensions.ScaleTo(leftHand, 1024, 768);
+
+                    leftEllipse.SetValue(Canvas.TopProperty, leftPoint.Position.Y);
+                    leftEllipse.SetValue(Canvas.LeftProperty, leftPoint.Position.X);
+
+                    Joint rightHand = playerSkeleton.Joints[JointType.HandRight];
+                    Joint rightPoint = SkeletalExtensions.ScaleTo(rightHand, 1024, 768);
+
+                    rightEllipse.SetValue(Canvas.TopProperty, rightPoint.Position.Y);
+                    rightEllipse.SetValue(Canvas.LeftProperty, rightPoint.Position.X);
+
                 }
                 else
                 {
@@ -266,20 +325,8 @@ namespace iNetworkClient
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            switch (((Button)sender).Content.ToString())
-            {
-                case "Close":
-                    ChangeAllCalendarEventStates(CalendarEvent.State.Close);
-                    break;
-                case "Medium":
-                    ChangeAllCalendarEventStates(CalendarEvent.State.Medium);
-                    break;
-                case "Far":
-                    ChangeAllCalendarEventStates(CalendarEvent.State.Far);
-                    break;
-                default:
-                    break;
-            }
+            SendItem((ScatterViewItem)MainScatterView.Items[0]);
+
         }
 
         private void ChangeAllCalendarEventStates(CalendarEvent.State state)
@@ -305,6 +352,46 @@ namespace iNetworkClient
             return list;
         }
 
+        private void AnimateScatterViewToPoint(ScatterViewItem svi, Point endPoint)
+        {
+            Storyboard stb = new Storyboard();
+
+            PointAnimation moveCenter = new PointAnimation();
+            moveCenter.From = svi.ActualCenter;
+            moveCenter.To = endPoint;
+            moveCenter.FillBehavior = FillBehavior.Stop;
+            moveCenter.Duration = new Duration(TimeSpan.FromSeconds(2.0));
+            moveCenter.EasingFunction = new BackEase();
+
+            DoubleAnimation orientation = new DoubleAnimation();
+            orientation.From = svi.Orientation;
+            orientation.To = 0;
+            orientation.FillBehavior = FillBehavior.Stop;
+            orientation.Duration = new Duration(TimeSpan.FromSeconds(2.0));
+
+            stb.Children.Add(moveCenter);
+            Storyboard.SetTarget(moveCenter, svi);
+            Storyboard.SetTargetProperty(moveCenter, new PropertyPath(ScatterViewItem.CenterProperty));
+
+            stb.Children.Add(orientation);
+            Storyboard.SetTarget(orientation, svi);
+            Storyboard.SetTargetProperty(orientation, new PropertyPath(ScatterViewItem.OrientationProperty));
+
+            svi.Center = endPoint;
+            svi.Orientation = 0;
+            stb.Begin(this);
+        }
+
+        private void SendItem(ScatterViewItem svi)
+        {
+            CalendarEvent ce = (CalendarEvent)(svi.Content);
+
+            TransferableEvent te = new TransferableEvent(ce.EventName, ce.Date.ToString(), null);
+
+            Message message = new Message("EventItem");
+            message.AddField("eventItem", te);
+            _connection.SendMessage(message);
+        }
 
     }
 }

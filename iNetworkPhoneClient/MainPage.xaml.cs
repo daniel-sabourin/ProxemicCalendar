@@ -49,27 +49,32 @@ namespace iNetworkPhoneClient
 
         private void OnMessageReceived(object sender, Message msg)
         {
-            try
+            Deployment.Current.Dispatcher.BeginInvoke(() =>
             {
-                if (msg != null)
+                try
                 {
-                    switch (msg.Name)
+                    if (msg != null)
                     {
-                        default:
-                            // don't do anything
-                            break;
-                        case "Name-of-Message":
-                            // do something here
-                            break;
+                        switch (msg.Name)
+                        {
+                            default:
+                                // don't do anything
+                                break;
+                            case "EventItem":
+                                // do something here
+                                TransferableEvent tEvent = msg.GetField("eventItem", typeof(TransferableEvent)) as TransferableEvent;
+                                eventListBox.Items.Add(new EventItem(tEvent.EventName, DateTime.Now, null) { Width = eventListBox.ActualWidth });
 
+                                break;
+
+                        }
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(e.Message + "\n" + e.StackTrace);
-            }
-
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.Message + "\n" + e.StackTrace);
+                }
+            });
         }
 
         #endregion

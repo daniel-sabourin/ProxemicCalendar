@@ -15,8 +15,26 @@ namespace iNetworkPhoneClient
     public class TransferableEvent : ITransferable
     {
         string _eventName;
+        public string EventName
+        {
+            get { return _eventName; }
+            set { _eventName = value; }
+        }
+
         string _eventTime;
+
+        public string EventTime
+        {
+            get { return _eventTime; }
+            set { _eventTime = value; }
+        }
+
         byte[] _eventImage;
+        public byte[] EventImage
+        {
+            get { return _eventImage; }
+            set { _eventImage = value; }
+        }
 
         public TransferableEvent(string eventName, string eventTime, byte[] eventImage)
         {

@@ -87,7 +87,7 @@ namespace iNetworkClient
 
         public ScatterViewItem CreateScatterViewItem()
         {
-            ScatterViewItem svi = new ScatterViewItem() { Width = 256, Height = 256, Content = this, Background = Brushes.Transparent };
+            ScatterViewItem svi = new ScatterViewItem() { Orientation = 0, Width = 256, Height = 256, Content = this, Background = Brushes.Transparent };
 
             svi.ShowsActivationEffects = false;
             svi.BorderBrush = System.Windows.Media.Brushes.Transparent;

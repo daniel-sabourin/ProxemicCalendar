@@ -66,6 +66,7 @@
     <Compile Include="CalendarEvent.xaml.cs">
       <DependentUpon>CalendarEvent.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SkeletalHelper.cs" />
     <Compile Include="SkeletonVisualizer.xaml.cs">
       <DependentUpon>SkeletonVisualizer.xaml</DependentUpon>
     </Compile>
