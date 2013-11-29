@@ -32,11 +32,13 @@ namespace iNetworkPhoneClient
             eventName.Text = tEvent.EventName;
             eventTime.Text = DateTime.Now.ToString();
 
-            BitmapImage bitmapimage = new BitmapImage();
-            MemoryStream stream = new MemoryStream(tEvent.EventImage);
-            bitmapimage.SetSource(stream);
+            using (MemoryStream stream = new MemoryStream(tEvent.EventImage))
+            {
+                BitmapImage bitmapimage = new BitmapImage();
+                bitmapimage.SetSource(stream);
+                eventImage.Source = bitmapimage;
+            }
 
-            eventImage.Source = bitmapimage;
         }
 
         public void Selected()
