@@ -257,6 +257,24 @@ namespace iNetworkClient
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[0];
+
+            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(500, MainScatterView.ActualHeight), TimeSpan.FromSeconds(3));
+            pA.FillBehavior = FillBehavior.Stop;
+            pA.Completed += delegate(object sender2, EventArgs e2)
+            {
+                Point newPoint = CalculateNextPoint(pA.From.Value, pA.To.Value, new Rect(0, 0, MainScatterView.ActualWidth, MainScatterView.ActualHeight));
+                pA.From = pA.To.Value;
+                pA.To = newPoint;
+
+                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);
+
+                svi.Center = pA.To.Value;
+                svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
+            };
+
+            svi.Center = pA.To.Value;
+            svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
 
             #region Kinect Setup
 
@@ -435,6 +453,119 @@ namespace iNetworkClient
             svi.Center = endPoint;
             svi.Orientation = 0;
             stb.Begin(this);
+        }
+
+        private TimeSpan CalculateTime(Point p1, Point p2, double speed)
+        {
+            double distance = CalculateDistance(p1, p2);
+            return TimeSpan.FromSeconds(distance / speed);
+        }
+
+        public double CalculateDistance(Point p1, Point p2)
+        {
+            return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
+        }
+
+        private double CalculateSlope(Point p1, Point p2)
+        {
+            return (p2.Y - p1.Y) / (p2.X - p1.X);
+        }
+
+        private double CalculateB(double slope, Point p)
+        {
+            return p.Y - (slope * p.X);
+        }
+
+        private double CalculateX(double slope, double y, double b)
+        {
+            return (y - b) / slope;
+        }
+
+        private double CalculateY(double slope, double x, double b)
+        {
+            return (slope * x) + b;
+        }
+
+        private Point CalculateNextPoint(Point startingPoint, Point collisionPoint, Rect rect)
+        {
+            double s = -1 * CalculateSlope(startingPoint, collisionPoint);
+            double b = CalculateB(s, collisionPoint);
+
+            int side = CalculateSide(collisionPoint, rect);
+
+            double colX = 0;
+            double colY = 0;
+
+            if (s < 0)
+            {
+                switch (side)
+                {
+                    case 0:
+                    case 1:
+                        colX = CalculateX(s, rect.Bottom, b);
+                        colY = CalculateY(s, rect.Left, b);
+                        break;
+                    case 2:
+                    case 3:
+                        colX = CalculateX(s, rect.Top, b);
+                        colY = CalculateY(s, rect.Right, b);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                switch (side)
+                {
+                    case 0:
+                    case 3:
+                        colX = CalculateX(s, rect.Bottom, b);
+                        colY = CalculateY(s, rect.Right, b);
+                        break;
+                    case 1:
+                    case 2:
+                        colX = CalculateX(s, rect.Top, b);
+                        colY = CalculateY(s, rect.Left, b);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            Point colPX = new Point(colX, CalculateY(s,colX,b));
+            Point colPY = new Point(CalculateX(s,colY,b),colY);
+
+            if (rect.Contains(colPX))
+                return colPX;
+            else if (rect.Contains(colPY))
+                return colPY;
+            else
+                return new Point(0, 0);
+
+        }
+
+        private int CalculateSide(Point p, Rect rect)
+        {
+            if (p.Y == rect.Top)
+            {
+                return 0;
+            }
+            else if (p.X == rect.Right)
+            {
+                return 1;
+            }
+            else if (p.Y == rect.Bottom)
+            {
+                return 2;
+            }
+            else if (p.X == rect.Left)
+            {
+                return 3;
+            }
+
+            return -1;
         }
 
         private void SendItem(ScatterViewItem svi)
