@@ -73,7 +73,7 @@ namespace iNetworkClient
 
                     if (value == CalendarEvent.State.Medium || value == CalendarEvent.State.Close)
                     {
-                        SetAnimationStatus(false);
+                        SetStoryboardStatus(false);
 
                         rightEllipse.Opacity = 1;
 
@@ -101,7 +101,8 @@ namespace iNetworkClient
                         Canvas.SetLeft(rightEllipse, 0);
                         Canvas.SetTop(rightEllipse, 0);
 
-                        SetAnimationStatus(true);
+                        UpdateStoryboards();
+                        SetStoryboardStatus(true);
                     }
 
                     if (value == CalendarEvent.State.Close)
@@ -124,7 +125,7 @@ namespace iNetworkClient
             }
         }
 
-        private Dictionary<ScatterViewItem, PointAnimation> AnimationDictionary = new Dictionary<ScatterViewItem, PointAnimation>();
+        private Dictionary<ScatterViewItem, Storyboard> StoryboardDictionary = new Dictionary<ScatterViewItem, Storyboard>();
 
         #region iNetwork Methods
 
@@ -165,9 +166,9 @@ namespace iNetworkClient
 
                                 MainScatterView.Items.Add(svi);
 
-                                PointAnimation pA = CreateAnimation(svi);
-                                AnimationDictionary[svi] = pA;
-                                AnimationDictionary[svi].BeginAnimation(ScatterViewItem.CenterProperty, pA);
+                                Storyboard sb = CreateStoryboard(svi);
+                                StoryboardDictionary[svi] = sb;
+                                sb.Begin();
 
                                 break;
 
@@ -250,12 +251,14 @@ namespace iNetworkClient
             mediaElement.Play();
         }
 
+        bool storyboardplaying = true;
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Escape)
                 Application.Current.Shutdown();
 
-            SetAnimationStatus(false);
+            storyboardplaying = !storyboardplaying;
+            SetStoryboardStatus(storyboardplaying);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -268,16 +271,8 @@ namespace iNetworkClient
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[0];
-            AnimationDictionary[svi] = CreateAnimation(svi);
-            svi = (ScatterViewItem)MainScatterView.Items[1];
-            AnimationDictionary[svi] = CreateAnimation(svi);
-            svi = (ScatterViewItem)MainScatterView.Items[2];
-            AnimationDictionary[svi] = CreateAnimation(svi);
-            svi = (ScatterViewItem)MainScatterView.Items[3];
-            AnimationDictionary[svi] = CreateAnimation(svi);
-
-            SetAnimationStatus(true);
+            UpdateStoryboards();
+            SetStoryboardStatus(true);
 
             #region Kinect Setup
 
@@ -331,20 +326,30 @@ namespace iNetworkClient
             #endregion
         }
 
-        private void SetAnimationStatus(bool on)
+        private void UpdateStoryboards()
+        {
+            foreach (object o in MainScatterView.Items)
+            {
+                ScatterViewItem svi = (ScatterViewItem)o;
+                StoryboardDictionary[svi] = CreateStoryboard(svi);
+            }
+        }
+
+        private void SetStoryboardStatus(bool on)
         {
             if (on)
             {
-                foreach (KeyValuePair<ScatterViewItem, PointAnimation> pair in AnimationDictionary)
-                    pair.Key.BeginAnimation(ScatterViewItem.CenterProperty, pair.Value);
+                foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
+                    pair.Value.Begin();
             }
             else
             {
-                foreach (KeyValuePair<ScatterViewItem, PointAnimation> pair in AnimationDictionary)
+                foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
                 {
-                    pair.Key.BeginAnimation(ScatterViewItem.CenterProperty, null);
-                    //pair.Key.Center = pair.Value.To.Value;
+                    pair.Value.Stop();
                 }
+
+                //UpdateStoryboards();
             }
         }
 
@@ -445,27 +450,28 @@ namespace iNetworkClient
             return list;
         }
 
-        private PointAnimation CreateAnimation(ScatterViewItem svi)
+        private Storyboard CreateStoryboard(ScatterViewItem svi)
         {
+            Storyboard sb = new Storyboard();
             PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, MainScatterView.ActualHeight / 2), TimeSpan.FromSeconds(3));
+            pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);            
             pA.FillBehavior = FillBehavior.Stop;
-            pA.Completed += delegate(object sender2, EventArgs e2)
+            pA.Completed += delegate(object sender, EventArgs e)
             {
                 Point newPoint = CalculateNextPoint(pA.From.Value, pA.To.Value, new Rect(0, 0, MainScatterView.ActualWidth, MainScatterView.ActualHeight));
 
                 pA.From = pA.To.Value;
                 pA.To = newPoint;
-
                 pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);
 
                 svi.Center = pA.To.Value;
-                svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
+                sb.Begin();
             };
 
-            svi.Center = pA.To.Value;
-            //svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
-
-            return pA;
+            Storyboard.SetTarget(pA, svi);
+            Storyboard.SetTargetProperty(pA, new PropertyPath(ScatterViewItem.CenterProperty));
+            sb.Children.Add(pA);
+            return sb;
         }
 
         private void AnimateScatterViewToPoint(ScatterViewItem svi, Point endPoint)
