@@ -166,9 +166,12 @@ namespace iNetworkClient
 
                                 MainScatterView.Items.Add(svi);
 
-                                Storyboard sb = CreateStoryboard(svi);
-                                StoryboardDictionary[svi] = sb;
-                                sb.Begin();
+                                svi.Loaded += delegate(object sender2, RoutedEventArgs e)
+                                {
+                                    Storyboard sb = CreateStoryboard(svi);
+                                    StoryboardDictionary[svi] = sb;
+                                    sb.Begin();
+                                };
 
                                 break;
 
@@ -417,14 +420,6 @@ namespace iNetworkClient
                     PlayerDepth = 9001;
                 }
             }
-        }
-
-
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            SendItem((ScatterViewItem)MainScatterView.Items[0]);
-
         }
 
         private void ChangeAllCalendarEventStates(CalendarEvent.State state)
