@@ -173,18 +173,68 @@ namespace iNetworkClient
 
         private byte[] sourceToByteArray(BitmapSource bs)
         {
+            System.Drawing.Image resizedImage = ResizeImage(BitmapFromSource(bs), new System.Drawing.Size(64, 64), true);
+
+            MemoryStream ms = new MemoryStream();
+            resizedImage.Save(ms, System.Drawing.Imaging.ImageFormat.Jpeg);
+            System.Windows.Media.Imaging.BitmapImage bImg = new System.Windows.Media.Imaging.BitmapImage();
+            bImg.BeginInit();
+            bImg.StreamSource = new MemoryStream(ms.ToArray());
+            bImg.EndInit();
+
             JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(bs));
-            encoder.QualityLevel = 25;
+            encoder.Frames.Add(BitmapFrame.Create(bImg));
+            encoder.QualityLevel = 20;
             byte[] ba = new byte[0];
             using (MemoryStream stream = new MemoryStream())
             {
-                encoder.Frames.Add(BitmapFrame.Create(bs));
+                encoder.Frames.Add(BitmapFrame.Create(bImg));
                 encoder.Save(stream);
                 ba = stream.ToArray();
                 stream.Close();
             }
             return ba;
+        }
+
+        private System.Drawing.Bitmap BitmapFromSource(BitmapSource bitmapsource)
+        {
+            System.Drawing.Bitmap bitmap;
+            using (MemoryStream outStream = new MemoryStream())
+            {
+                BitmapEncoder enc = new BmpBitmapEncoder();
+                enc.Frames.Add(BitmapFrame.Create(bitmapsource));
+                enc.Save(outStream);
+                bitmap = new System.Drawing.Bitmap(outStream);
+            }
+            return bitmap;
+        }
+
+        public static System.Drawing.Image ResizeImage(System.Drawing.Image image, System.Drawing.Size size, bool preserveAspectRatio = true)
+        {
+            int newWidth;
+            int newHeight;
+            if (preserveAspectRatio)
+            {
+                int originalWidth = image.Width;
+                int originalHeight = image.Height;
+                float percentWidth = (float)size.Width / (float)originalWidth;
+                float percentHeight = (float)size.Height / (float)originalHeight;
+                float percent = percentHeight < percentWidth ? percentHeight : percentWidth;
+                newWidth = (int)(originalWidth * percent);
+                newHeight = (int)(originalHeight * percent);
+            }
+            else
+            {
+                newWidth = size.Width;
+                newHeight = size.Height;
+            }
+            System.Drawing.Image newImage = new System.Drawing.Bitmap(newWidth, newHeight);
+            using (System.Drawing.Graphics graphicsHandle = System.Drawing.Graphics.FromImage(newImage))
+            {
+                graphicsHandle.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                graphicsHandle.DrawImage(image, 0, 0, newWidth, newHeight);
+            }
+            return newImage;
         }
 
         private void AnimateToState(State state)
