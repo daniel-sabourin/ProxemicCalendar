@@ -190,6 +190,21 @@ namespace iNetworkClient
                 this.Dispatcher.Invoke(new Action(delegate()
                 {
                     SendItem(HoveredItem);
+
+                    ScatterViewItem itemToRemove = HoveredItem;
+
+                    DoubleAnimation widthAnim = new DoubleAnimation(HoveredItem.ActualWidth, 0, TimeSpan.FromSeconds(0.5));
+                    widthAnim.Completed += delegate(object sender, EventArgs e)
+                    {
+                        MainScatterView.Items.Remove(itemToRemove);
+                    };
+                    HoveredItem.BeginAnimation(ScatterViewItem.WidthProperty, widthAnim);
+
+                    DoubleAnimation heightAnim = new DoubleAnimation(HoveredItem.ActualHeight, 0, TimeSpan.FromSeconds(0.5));
+                    HoveredItem.BeginAnimation(ScatterViewItem.HeightProperty, heightAnim);
+
+                    DoubleAnimation opacityAnim = new DoubleAnimation(HoveredItem.Opacity, 0, TimeSpan.FromSeconds(0.5));
+                    HoveredItem.BeginAnimation(ScatterViewItem.OpacityProperty, opacityAnim);      
                 }));
             };
 
