@@ -73,6 +73,8 @@ namespace iNetworkClient
 
                     if (value == CalendarEvent.State.Medium || value == CalendarEvent.State.Close)
                     {
+                        SetAnimationStatus(false);
+
                         rightEllipse.Opacity = 1;
 
                         int cellSize = 286;
@@ -98,6 +100,8 @@ namespace iNetworkClient
                         rightEllipse.Opacity = 0;
                         Canvas.SetLeft(rightEllipse, 0);
                         Canvas.SetTop(rightEllipse, 0);
+
+                        SetAnimationStatus(true);
                     }
 
                     if (value == CalendarEvent.State.Close)
@@ -120,6 +124,7 @@ namespace iNetworkClient
             }
         }
 
+        private Dictionary<ScatterViewItem, PointAnimation> AnimationDictionary = new Dictionary<ScatterViewItem, PointAnimation>();
 
         #region iNetwork Methods
 
@@ -159,6 +164,10 @@ namespace iNetworkClient
                                 ScatterViewItem svi = ce.CreateScatterViewItem();
 
                                 MainScatterView.Items.Add(svi);
+
+                                PointAnimation pA = CreateAnimation(svi);
+                                AnimationDictionary[svi] = pA;
+                                AnimationDictionary[svi].BeginAnimation(ScatterViewItem.CenterProperty, pA);
 
                                 break;
 
@@ -245,6 +254,8 @@ namespace iNetworkClient
         {
             if (e.Key == Key.Escape)
                 Application.Current.Shutdown();
+
+            SetAnimationStatus(false);
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -258,23 +269,15 @@ namespace iNetworkClient
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[0];
+            AnimationDictionary[svi] = CreateAnimation(svi);
+            svi = (ScatterViewItem)MainScatterView.Items[1];
+            AnimationDictionary[svi] = CreateAnimation(svi);
+            svi = (ScatterViewItem)MainScatterView.Items[2];
+            AnimationDictionary[svi] = CreateAnimation(svi);
+            svi = (ScatterViewItem)MainScatterView.Items[3];
+            AnimationDictionary[svi] = CreateAnimation(svi);
 
-            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(500, MainScatterView.ActualHeight), TimeSpan.FromSeconds(3));
-            pA.FillBehavior = FillBehavior.Stop;
-            pA.Completed += delegate(object sender2, EventArgs e2)
-            {
-                Point newPoint = CalculateNextPoint(pA.From.Value, pA.To.Value, new Rect(0, 0, MainScatterView.ActualWidth, MainScatterView.ActualHeight));
-                pA.From = pA.To.Value;
-                pA.To = newPoint;
-
-                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);
-
-                svi.Center = pA.To.Value;
-                svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
-            };
-
-            svi.Center = pA.To.Value;
-            svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
+            SetAnimationStatus(true);
 
             #region Kinect Setup
 
@@ -326,6 +329,23 @@ namespace iNetworkClient
             }
 
             #endregion
+        }
+
+        private void SetAnimationStatus(bool on)
+        {
+            if (on)
+            {
+                foreach (KeyValuePair<ScatterViewItem, PointAnimation> pair in AnimationDictionary)
+                    pair.Key.BeginAnimation(ScatterViewItem.CenterProperty, pair.Value);
+            }
+            else
+            {
+                foreach (KeyValuePair<ScatterViewItem, PointAnimation> pair in AnimationDictionary)
+                {
+                    pair.Key.BeginAnimation(ScatterViewItem.CenterProperty, null);
+                    //pair.Key.Center = pair.Value.To.Value;
+                }
+            }
         }
 
                 /// <summary>
@@ -423,6 +443,29 @@ namespace iNetworkClient
             }
 
             return list;
+        }
+
+        private PointAnimation CreateAnimation(ScatterViewItem svi)
+        {
+            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, MainScatterView.ActualHeight / 2), TimeSpan.FromSeconds(3));
+            pA.FillBehavior = FillBehavior.Stop;
+            pA.Completed += delegate(object sender2, EventArgs e2)
+            {
+                Point newPoint = CalculateNextPoint(pA.From.Value, pA.To.Value, new Rect(0, 0, MainScatterView.ActualWidth, MainScatterView.ActualHeight));
+
+                pA.From = pA.To.Value;
+                pA.To = newPoint;
+
+                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);
+
+                svi.Center = pA.To.Value;
+                svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
+            };
+
+            svi.Center = pA.To.Value;
+            //svi.BeginAnimation(ScatterViewItem.CenterProperty, pA);
+
+            return pA;
         }
 
         private void AnimateScatterViewToPoint(ScatterViewItem svi, Point endPoint)
@@ -542,7 +585,7 @@ namespace iNetworkClient
             else if (rect.Contains(colPY))
                 return colPY;
             else
-                return new Point(0, 0);
+                return new Point(500, 500);
 
         }
 
