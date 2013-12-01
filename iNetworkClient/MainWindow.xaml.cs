@@ -24,6 +24,7 @@ using System.Windows.Media.Animation;
 using System.Timers;
 using Fizbin.Kinect.Gestures;
 using Fizbin.Kinect.Gestures.Segments;
+using System.Collections;
 
 
 namespace iNetworkClient
@@ -45,8 +46,9 @@ namespace iNetworkClient
 
         private Timer TimeTimer;
 
-        private float _playerDepth;
+        private ScatterViewItem IgnoredEvent;
 
+        private float _playerDepth;
         public float PlayerDepth
         {
             get { return _playerDepth; }
@@ -83,11 +85,14 @@ namespace iNetworkClient
                         trackingEllipse.Opacity = 1;
 
                         AlignToGrid();
+                        SetIgnoredOpacity(0.4);
+                        AmbientSpeed = 50;
                     }
                     else
                     {
                         DisableTracking();
-                        //InSelectionMode = false;
+                        AmbientSpeed = 150;
+                        SetIgnoredOpacity(1);
 
                         UpdateStoryboards();
                         SetStoryboardStatus(true);
@@ -146,7 +151,6 @@ namespace iNetworkClient
                                 // don't do anything
                                 break;
                             case "EventItem":
-                                // do something here
                                 TransferableEvent tEvent = msg.GetField("eventItem", typeof(TransferableEvent)) as TransferableEvent;
 
                                 CalendarEvent ce = new CalendarEvent(tEvent) { EventState = PlayerState };
@@ -188,8 +192,6 @@ namespace iNetworkClient
         }
         #endregion
 
-
-
         public MainWindow()
         {
             InitializeComponent();
@@ -223,10 +225,12 @@ namespace iNetworkClient
                 }));
             };
 
+            IgnoredEvent = new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now.AddDays(7)).CreateScatterViewItem();
+            MainScatterView.Items.Add(IgnoredEvent);
+
             MainScatterView.Items.Add(new CalendarEvent("Christmas", CreateImageFromFile("../../Resources/christmas.png"), DateTime.Parse("25/12/2013")).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now.AddHours(1)).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("New Years", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Parse("31/12/2013")).CreateScatterViewItem());
-            MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now.AddDays(7)).CreateScatterViewItem());
 
             CreateIndicatorStoryboard();
         }
@@ -263,9 +267,11 @@ namespace iNetworkClient
         {
             if (e.Key == Key.Escape)
                 Application.Current.Shutdown();
-
-            storyboardplaying = !storyboardplaying;
-            SetStoryboardStatus(storyboardplaying);
+            else if (e.Key == Key.Space)
+            {
+                storyboardplaying = !storyboardplaying;
+                SetStoryboardStatus(storyboardplaying);
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -537,7 +543,9 @@ namespace iNetworkClient
             int numberOfRows = (int)MainScatterView.ActualHeight / cellSize;
             int numberOfCols = (int)MainScatterView.ActualWidth / cellSize;
 
-            for (int i = 0; i < MainScatterView.Items.Count; i++)
+            ArrayList list = GetAllNotIgnoredSVI();
+
+            for (int i = 0; i < list.Count; i++)
             {
                 int rowPos = i / numberOfCols;
                 int colPos = i % numberOfCols;
@@ -545,10 +553,23 @@ namespace iNetworkClient
                 int x = cellSize * colPos + (cellSize / 2);
                 int y = cellSize * rowPos + (cellSize / 2);
 
-                ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[i];
+                ScatterViewItem svi = (ScatterViewItem)list[i];
                 AnimateScatterViewToPoint(svi, new Point(x, y));
 
             }
+        }
+
+        private ArrayList GetAllNotIgnoredSVI()
+        {
+            ArrayList list = new ArrayList();
+            foreach (object o in MainScatterView.Items)
+            {
+                if (!o.Equals(IgnoredEvent))
+                    list.Add(o);
+            }
+
+
+            return list;
         }
 
         private void UpdateStoryboards()
@@ -558,6 +579,12 @@ namespace iNetworkClient
                 ScatterViewItem svi = (ScatterViewItem)o;
                 StoryboardDictionary[svi] = CreateStoryboard(svi);
             }
+        }
+
+        private void SetIgnoredOpacity(double opacity)
+        {
+            DoubleAnimation anim = new DoubleAnimation(IgnoredEvent.Opacity, opacity, TimeSpan.FromSeconds(1));
+            IgnoredEvent.BeginAnimation(ScatterViewItem.OpacityProperty, anim);
         }
 
         private void SetStoryboardStatus(bool on)
@@ -571,16 +598,18 @@ namespace iNetworkClient
             {
                 foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
                 {
-                    pair.Value.Stop();
+                    if(!pair.Key.Equals(IgnoredEvent))
+                        pair.Value.Stop();
                 }
             }
         }
 
+        int AmbientSpeed = 150;
         private Storyboard CreateStoryboard(ScatterViewItem svi)
         {
             Storyboard sb = new Storyboard();
             PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, MainScatterView.ActualHeight - (svi.ActualHeight / 2)), TimeSpan.FromSeconds(3));
-            pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 150);            
+            pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 300);            
             pA.FillBehavior = FillBehavior.Stop;
             pA.Completed += delegate(object sender, EventArgs e)
             {
@@ -588,7 +617,7 @@ namespace iNetworkClient
 
                 pA.From = pA.To.Value;
                 pA.To = newPoint;
-                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 150);
+                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, AmbientSpeed);
 
                 svi.Center = pA.To.Value;
                 sb.Begin();

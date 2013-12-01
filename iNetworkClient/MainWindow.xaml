@@ -7,7 +7,7 @@
         Title="Proxemic Display" Height="350" Width="525" WindowState="Maximized" WindowStyle="None" KeyUp="Window_KeyUp" Loaded="Window_Loaded" Closing="Window_Closing">
     <Grid>
         <MediaElement Name="mediaElement" Stretch="Fill"></MediaElement>
-        <Controls:SkeletonVisualizer x:Name="SkeletonViz" Opacity="0.75"></Controls:SkeletonVisualizer>
+        <Controls:SkeletonVisualizer x:Name="SkeletonViz" Opacity="0.75" Visibility="Hidden"></Controls:SkeletonVisualizer>
         <s:ScatterView x:Name="MainScatterView"/>
         
         <Canvas>
