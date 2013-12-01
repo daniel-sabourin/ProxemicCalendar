@@ -9,7 +9,7 @@
         
         <Ellipse StrokeThickness="1" Stroke="Black">
             <Ellipse.Fill>
-                <ImageBrush Stretch="UniformToFill" TileMode="None" x:Name="imageBrush" ImageSource="/iNetwork%20WPF%20Client1;component/Resources/Koala.jpg" />
+                <ImageBrush Stretch="UniformToFill" TileMode="None" x:Name="imageBrush"/>
             </Ellipse.Fill>
         </Ellipse>
         

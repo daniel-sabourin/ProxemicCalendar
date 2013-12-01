@@ -124,7 +124,6 @@
     <Content Include="Resources\background.mov" />
     <Resource Include="Resources\leftHand.png" />
     <Resource Include="Resources\rightHand.png" />
-    <Resource Include="Resources\Koala.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
