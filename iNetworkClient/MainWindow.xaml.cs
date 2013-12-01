@@ -580,7 +580,7 @@ namespace iNetworkClient
         {
             Storyboard sb = new Storyboard();
             PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, MainScatterView.ActualHeight - (svi.ActualHeight / 2)), TimeSpan.FromSeconds(3));
-            pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);            
+            pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 150);            
             pA.FillBehavior = FillBehavior.Stop;
             pA.Completed += delegate(object sender, EventArgs e)
             {
@@ -588,7 +588,7 @@ namespace iNetworkClient
 
                 pA.From = pA.To.Value;
                 pA.To = newPoint;
-                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);
+                pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 150);
 
                 svi.Center = pA.To.Value;
                 sb.Begin();
