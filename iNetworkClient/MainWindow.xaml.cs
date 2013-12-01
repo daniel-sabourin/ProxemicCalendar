@@ -43,6 +43,8 @@ namespace iNetworkClient
         private ScatterViewItem HoveredItem;
         private Timer HoverTimer;
 
+        private Timer TimeTimer;
+
         private float _playerDepth;
 
         public float PlayerDepth
@@ -147,8 +149,6 @@ namespace iNetworkClient
                                 // do something here
                                 TransferableEvent tEvent = msg.GetField("eventItem", typeof(TransferableEvent)) as TransferableEvent;
 
-                                //DateTime dt = DateTime.Parse(tEvent.EventTime);
-
                                 CalendarEvent ce = new CalendarEvent(tEvent) { EventState = PlayerState };
                                 ScatterViewItem svi = ce.CreateScatterViewItem();
 
@@ -175,7 +175,6 @@ namespace iNetworkClient
                     Console.WriteLine(e.Message + "\n" + e.StackTrace);
                 }
             }));
-
         }
 
         private void SendItem(ScatterViewItem svi)
@@ -277,8 +276,27 @@ namespace iNetworkClient
             }
         }
 
+
+        private void UpdateTimeLabels(DateTime time)
+        {
+            this.Dispatcher.Invoke(new Action(delegate()
+            {
+                dateLabel.Content = time.ToString("dddd, MMMM d");
+                timeLabel.Content = time.ToString("h:mm tt");
+            }));
+        }
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            UpdateTimeLabels(DateTime.Now);
+            TimeTimer = new Timer(60000);
+            TimeTimer.AutoReset = true;
+            TimeTimer.Elapsed += delegate(object sender2, ElapsedEventArgs e2)
+            {
+                UpdateTimeLabels(DateTime.Now);
+            };
+            TimeTimer.Start();
+
             UpdateStoryboards();
             SetStoryboardStatus(true);
 

@@ -22,6 +22,19 @@
             </Canvas>
 
         </Canvas>
-       
+
+        <StackPanel VerticalAlignment="Bottom" Margin="20">
+            <Label x:Name="timeLabel" FontSize="70" Content="12:00 AM" HorizontalAlignment="Left" Foreground="White" FontFamily="Roboto">
+                <Label.Effect>
+                    <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.75" BlurRadius="5"/>
+                </Label.Effect>
+            </Label>
+            
+            <Label x:Name="dateLabel" FontSize="50" Content="Sunday, January 1" HorizontalAlignment="Left" Foreground="White" FontFamily="Roboto">
+                <Label.Effect>
+                    <DropShadowEffect ShadowDepth="5" Color="Black" Opacity="0.75" BlurRadius="5"/>
+                </Label.Effect>
+            </Label>
+        </StackPanel>
     </Grid>
 </Window>
