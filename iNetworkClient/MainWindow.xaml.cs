@@ -187,6 +187,16 @@ namespace iNetworkClient
             }));
 
         }
+
+        private void SendItem(ScatterViewItem svi)
+        {
+            CalendarEvent ce = (CalendarEvent)(svi.Content);
+            TransferableEvent te = ce.CreateTransferableEvent();
+
+            Message message = new Message("EventItem");
+            message.AddField("eventItem", te);
+            _connection.SendMessage(message);
+        }
         #endregion
 
 
@@ -409,32 +419,8 @@ namespace iNetworkClient
             InSelectionMode = !InSelectionMode;
         }
 
-        private void UpdateStoryboards()
-        {
-            foreach (object o in MainScatterView.Items)
-            {
-                ScatterViewItem svi = (ScatterViewItem)o;
-                StoryboardDictionary[svi] = CreateStoryboard(svi);
-            }
-        }
 
-        private void SetStoryboardStatus(bool on)
-        {
-            if (on)
-            {
-                foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
-                    pair.Value.Begin();
-            }
-            else
-            {
-                foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
-                {
-                    pair.Value.Stop();
-                }
-            }
-        }
-
-                /// <summary>
+        /// <summary>
         /// Event handler for Kinect sensor's SkeletonFrameReady event
         /// </summary>
         /// <param name="sender">object sending the event</param>
@@ -732,15 +718,6 @@ namespace iNetworkClient
             return -1;
         }
 
-        private void SendItem(ScatterViewItem svi)
-        {
-            CalendarEvent ce = (CalendarEvent)(svi.Content);
-            TransferableEvent te = ce.CreateTransferableEvent();
-
-            Message message = new Message("EventItem");
-            message.AddField("eventItem", te);
-            _connection.SendMessage(message);
-        }
-
+        #endregion
     }
 }
