@@ -80,28 +80,12 @@ namespace iNetworkClient
 
                         trackingEllipse.Opacity = 1;
 
-                        int cellSize = 286;
-
-                        int numberOfRows = (int)MainScatterView.ActualHeight / cellSize;
-                        int numberOfCols = (int)MainScatterView.ActualWidth / cellSize;
-
-                        for (int i = 0; i < MainScatterView.Items.Count; i++)
-                        {
-                            int rowPos = i / numberOfCols;
-                            int colPos = i % numberOfCols;
-
-                            int x = cellSize * colPos + (cellSize / 2);
-                            int y = cellSize * rowPos + (cellSize / 2);
-
-                            ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[i];
-                            AnimateScatterViewToPoint(svi, new Point(x, y));
-
-                        }
+                        AlignToGrid();
                     }
                     else
                     {
-                        //DisableTracking();
-                        InSelectionMode = false;
+                        DisableTracking();
+                        //InSelectionMode = false;
 
                         UpdateStoryboards();
                         SetStoryboardStatus(true);
@@ -172,7 +156,11 @@ namespace iNetworkClient
                                 {
                                     Storyboard sb = CreateStoryboard(svi);
                                     StoryboardDictionary[svi] = sb;
-                                    sb.Begin();
+
+                                    if (PlayerState == CalendarEvent.State.Far)
+                                        sb.Begin();
+                                    else
+                                        AlignToGrid();
                                 };
 
                                 break;
@@ -222,6 +210,7 @@ namespace iNetworkClient
                     widthAnim.Completed += delegate(object sender, EventArgs e)
                     {
                         MainScatterView.Items.Remove(itemToRemove);
+                        AlignToGrid();
                     };
                     HoveredItem.BeginAnimation(ScatterViewItem.WidthProperty, widthAnim);
 
@@ -481,7 +470,7 @@ namespace iNetworkClient
                 }
                 else
                 {
-                    PlayerDepth = 9001;
+                    PlayerState = CalendarEvent.State.Far;
                 }
             }
         }
@@ -511,6 +500,27 @@ namespace iNetworkClient
 
         #region Animation
 
+        private void AlignToGrid()
+        {
+            int cellSize = 286;
+
+            int numberOfRows = (int)MainScatterView.ActualHeight / cellSize;
+            int numberOfCols = (int)MainScatterView.ActualWidth / cellSize;
+
+            for (int i = 0; i < MainScatterView.Items.Count; i++)
+            {
+                int rowPos = i / numberOfCols;
+                int colPos = i % numberOfCols;
+
+                int x = cellSize * colPos + (cellSize / 2);
+                int y = cellSize * rowPos + (cellSize / 2);
+
+                ScatterViewItem svi = (ScatterViewItem)MainScatterView.Items[i];
+                AnimateScatterViewToPoint(svi, new Point(x, y));
+
+            }
+        }
+
         private void UpdateStoryboards()
         {
             foreach (object o in MainScatterView.Items)
@@ -539,7 +549,7 @@ namespace iNetworkClient
         private Storyboard CreateStoryboard(ScatterViewItem svi)
         {
             Storyboard sb = new Storyboard();
-            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, svi.ActualHeight / 2), TimeSpan.FromSeconds(3));
+            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, MainScatterView.ActualHeight - (svi.ActualHeight / 2)), TimeSpan.FromSeconds(3));
             pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);            
             pA.FillBehavior = FillBehavior.Stop;
             pA.Completed += delegate(object sender, EventArgs e)
