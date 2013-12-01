@@ -523,15 +523,42 @@ namespace iNetworkClient
             return list;
         }
 
+        #region Animation
+
+        private void UpdateStoryboards()
+        {
+            foreach (object o in MainScatterView.Items)
+            {
+                ScatterViewItem svi = (ScatterViewItem)o;
+                StoryboardDictionary[svi] = CreateStoryboard(svi);
+            }
+        }
+
+        private void SetStoryboardStatus(bool on)
+        {
+            if (on)
+            {
+                foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
+                    pair.Value.Begin();
+            }
+            else
+            {
+                foreach (KeyValuePair<ScatterViewItem, Storyboard> pair in StoryboardDictionary)
+                {
+                    pair.Value.Stop();
+                }
+            }
+        }
+
         private Storyboard CreateStoryboard(ScatterViewItem svi)
         {
             Storyboard sb = new Storyboard();
-            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, MainScatterView.ActualHeight / 2), TimeSpan.FromSeconds(3));
+            PointAnimation pA = new PointAnimation(svi.ActualCenter, new Point(MainScatterView.ActualWidth / 2, svi.ActualHeight / 2), TimeSpan.FromSeconds(3));
             pA.Duration = CalculateTime(pA.From.Value, pA.To.Value, 250);            
             pA.FillBehavior = FillBehavior.Stop;
             pA.Completed += delegate(object sender, EventArgs e)
             {
-                Point newPoint = CalculateNextPoint(pA.From.Value, pA.To.Value, new Rect(0, 0, MainScatterView.ActualWidth, MainScatterView.ActualHeight));
+                Point newPoint = CalculateNextPoint(pA.From.Value, pA.To.Value, new Rect(svi.ActualWidth / 2, svi.ActualHeight / 2, MainScatterView.ActualWidth - svi.ActualWidth, MainScatterView.ActualHeight - svi.ActualHeight));
 
                 pA.From = pA.To.Value;
                 pA.To = newPoint;
@@ -576,7 +603,9 @@ namespace iNetworkClient
             svi.Orientation = 0;
             stb.Begin(this);
         }
+        #endregion
 
+        #region Next Point Checking
         private TimeSpan CalculateTime(Point p1, Point p2, double speed)
         {
             double distance = CalculateDistance(p1, p2);
@@ -610,13 +639,15 @@ namespace iNetworkClient
 
         private Point CalculateNextPoint(Point startingPoint, Point collisionPoint, Rect rect)
         {
+            double threshold = 0.1;
+
             double s = -1 * CalculateSlope(startingPoint, collisionPoint);
             double b = CalculateB(s, collisionPoint);
 
-            int side = CalculateSide(collisionPoint, rect);
+            int side = CalculateSide(collisionPoint, rect, threshold);
 
-            double colX = 0;
-            double colY = 0;
+            double colX = rect.Left;
+            double colY = rect.Top;
 
             if (s < 0)
             {
@@ -656,33 +687,44 @@ namespace iNetworkClient
                 }
             }
 
-            Point colPX = new Point(colX, CalculateY(s,colX,b));
-            Point colPY = new Point(CalculateX(s,colY,b),colY);
+            Point colPX = new Point(colX, CalculateY(s, colX, b));
+            Point colPY = new Point(CalculateX(s, colY, b), colY);
 
-            if (rect.Contains(colPX))
+            if (InBounds(rect, colPX, threshold))
                 return colPX;
-            else if (rect.Contains(colPY))
+            else if (InBounds(rect, colPY, threshold))
                 return colPY;
             else
-                return new Point(500, 500);
+                return new Point(rect.Width / 2 + rect.X, rect.Top);
 
         }
 
-        private int CalculateSide(Point p, Rect rect)
+        private bool InBounds(Rect rect, Point p, double threshold)
         {
-            if (p.Y == rect.Top)
+            Rect rect2 = new Rect(rect.X - threshold, rect.Y - threshold, rect.Width + (2 * threshold), rect.Height + (2 * threshold));
+            return rect2.Contains(p);
+        }
+
+        private bool WithinThreshold(double d1, double d2, double threshold)
+        {
+            return Math.Abs(d1 - d2) < threshold;
+        }
+
+        private int CalculateSide(Point p, Rect rect, double threshold)
+        {
+            if (WithinThreshold(p.Y, rect.Top, threshold))
             {
                 return 0;
             }
-            else if (p.X == rect.Right)
+            else if (WithinThreshold(p.X, rect.Right, threshold))
             {
                 return 1;
             }
-            else if (p.Y == rect.Bottom)
+            else if (WithinThreshold(p.Y, rect.Bottom, threshold))
             {
                 return 2;
             }
-            else if (p.X == rect.Left)
+            else if (WithinThreshold(p.X, rect.Left, threshold))
             {
                 return 3;
             }
