@@ -71,7 +71,7 @@ namespace iNetworkClient
             {
                 _date = value;
 
-                timeLabel.Content = value.ToString();
+                timeLabel.Content = value.ToString("ddd MMM dd, yyyy \n hh:mm tt");
             }
         }
 
@@ -91,7 +91,7 @@ namespace iNetworkClient
 
             EventName = tEvent.EventName;
             Image = new Image() { Source = LoadImage(tEvent.EventImage) };
-            Date = DateTime.Now;
+            Date = DateTime.ParseExact(tEvent.EventTime, "ddd MMM dd, yyyy hh:mm tt", null);
         }
 
         public ScatterViewItem CreateScatterViewItem()
@@ -121,15 +121,15 @@ namespace iNetworkClient
         private double CalculateFontSize(Label textLabel)
         {
             // Very bad algorithm!
-            for (int i = 12; i < 150; i++)
+            for (int i = 12; i < 100; i++)
             {
                 double testWidth = MeasureString(i, textLabel).Width;
                 if (testWidth > this.ActualWidth - 40)
                     return i;
             }
 
-            // Max font size is 150
-            return 150;
+            // Max font size is 100
+            return 100;
         }
 
         private Size MeasureString(double fontSize, Label label)
@@ -281,7 +281,7 @@ namespace iNetworkClient
 
         public TransferableEvent CreateTransferableEvent()
         {
-            return new TransferableEvent(EventName, Date.ToString() , sourceToByteArray(Image.Source as BitmapSource));
+            return new TransferableEvent(EventName, Date.ToString("ddd MMM dd, yyyy hh:mm tt"), sourceToByteArray(Image.Source as BitmapSource));
         }
     }
 }

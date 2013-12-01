@@ -43,7 +43,7 @@
                             <ColumnDefinition Width="50*"></ColumnDefinition>
                         </Grid.ColumnDefinitions>
                         
-                        <toolkit:DatePicker Grid.Column="0" Name="datePicker"></toolkit:DatePicker>
+                        <toolkit:DatePicker Grid.Column="0" Name="datePicker" ValueStringFormat="{}{0:MMM dd, yyyy}"></toolkit:DatePicker>
                         <toolkit:TimePicker Grid.Column="1" Name="timePicker"></toolkit:TimePicker>
                     </Grid>
                    

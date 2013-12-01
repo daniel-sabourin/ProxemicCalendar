@@ -20,8 +20,9 @@ namespace iNetworkPhoneClient
         {
             InitializeComponent();
 
+
             eventName.Text = name;
-            eventTime.Text = time.ToString();
+            eventTime.Text = time.ToString("ddd MMM dd, yyyy hh:mm tt");
             eventImage.Source = bmp;
         }
 
@@ -30,7 +31,7 @@ namespace iNetworkPhoneClient
             InitializeComponent();
 
             eventName.Text = tEvent.EventName;
-            eventTime.Text = DateTime.Now.ToString();
+            eventTime.Text = DateTime.Parse(tEvent.EventTime).ToString("ddd MMM dd, yyyy hh:mm tt");
 
             using (MemoryStream stream = new MemoryStream(tEvent.EventImage))
             {
