@@ -10,12 +10,16 @@
         <Controls:SkeletonVisualizer x:Name="SkeletonViz" Opacity="0.75"></Controls:SkeletonVisualizer>
         <s:ScatterView x:Name="MainScatterView"/>
         
-        <Canvas Name="dotCanvas">
-            <Ellipse Width="64" Height="64" Name="trackingEllipse" Opacity="0" Visibility="Collapsed">
-                <Ellipse.Fill>
-                    <ImageBrush ImageSource="/iNetwork%20WPF%20Client1;component/Resources/rightHand.png" x:Name="trackingBrush" />
-                </Ellipse.Fill>
-            </Ellipse>
+        <Canvas>
+            <Canvas Width="96" Height="96" Name="trackingEllipse" Opacity="0" Visibility="Collapsed" Margin="-48,-48,0,0">
+                <Ellipse Width="96" Height="96" Fill="LightGreen" Opacity="0" Name="HoverIndicator"></Ellipse>
+
+                <Ellipse Width="64" Height="64" Margin="16,16,0,0">
+                    <Ellipse.Fill>
+                        <ImageBrush ImageSource="/iNetwork%20WPF%20Client1;component/Resources/rightHand.png" x:Name="trackingBrush" />
+                    </Ellipse.Fill>
+                </Ellipse>
+            </Canvas>
 
         </Canvas>
        

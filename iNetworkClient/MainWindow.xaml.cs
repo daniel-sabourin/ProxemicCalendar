@@ -112,6 +112,8 @@ namespace iNetworkClient
         }
 
         private Dictionary<ScatterViewItem, Storyboard> StoryboardDictionary = new Dictionary<ScatterViewItem, Storyboard>();
+        private Storyboard HoverStoryboard;
+
 
         #region iNetwork Methods
 
@@ -226,6 +228,8 @@ namespace iNetworkClient
             MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("Globalfest", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Now).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now).CreateScatterViewItem());
+
+            CreateIndicatorStoryboard();
         }
 
         private Image CreateImageFromFile(string path)
@@ -463,12 +467,16 @@ namespace iNetworkClient
                             {
                                 HoveredItem = (ScatterViewItem)sa;
                                 HoverTimer.Start();
+
+                                HoverStoryboard.Begin();
                             }
                         }
                         else
                         {
                             HoveredItem = null;
                             HoverTimer.Stop();
+
+                            HoverStoryboard.Stop();
                         }
                     }
                 }
@@ -602,6 +610,21 @@ namespace iNetworkClient
             svi.Center = endPoint;
             svi.Orientation = 0;
             stb.Begin(this);
+        }
+
+        private void CreateIndicatorStoryboard()
+        {
+            HoverStoryboard = new Storyboard();
+            DoubleAnimation indicatorAnim = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(HoverTimer.Interval));
+            indicatorAnim.Completed += delegate(object sender, EventArgs e)
+            {
+                HoverIndicator.Opacity = 0;
+            };
+            indicatorAnim.FillBehavior = FillBehavior.Stop;
+            Storyboard.SetTarget(indicatorAnim, HoverIndicator);
+            Storyboard.SetTargetProperty(indicatorAnim, new PropertyPath(Ellipse.OpacityProperty));
+
+            HoverStoryboard.Children.Add(indicatorAnim);
         }
         #endregion
 
