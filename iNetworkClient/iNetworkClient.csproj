@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Fizbin.Kinect.Gestures">
+      <HintPath>.\Fizbin.Kinect.Gestures.dll</HintPath>
+    </Reference>
     <Reference Include="GroupLab.iNetwork">
       <HintPath>..\..\..\..\..\..\..\Program Files (x86)\GroupLab\iNetwork\GroupLab.iNetwork.dll</HintPath>
     </Reference>
@@ -110,6 +113,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -118,6 +122,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\background.mov" />
+    <Resource Include="Resources\leftHand.png" />
+    <Resource Include="Resources\rightHand.png" />
     <Resource Include="Resources\Koala.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

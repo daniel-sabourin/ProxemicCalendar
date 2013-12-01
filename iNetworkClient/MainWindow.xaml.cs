@@ -22,6 +22,8 @@ using System.Globalization;
 using System.Windows.Threading;
 using System.Windows.Media.Animation;
 using System.Timers;
+using Fizbin.Kinect.Gestures;
+using Fizbin.Kinect.Gestures.Segments;
 
 
 namespace iNetworkClient
@@ -36,6 +38,7 @@ namespace iNetworkClient
         private int _port = 12345;
 
         private KinectSensor sensor;
+        private GestureController gestureController;
 
         private ScatterViewItem HoveredItem;
         private Timer HoverTimer;
@@ -75,7 +78,7 @@ namespace iNetworkClient
                     {
                         SetStoryboardStatus(false);
 
-                        rightEllipse.Opacity = 1;
+                        trackingEllipse.Opacity = 1;
 
                         int cellSize = 286;
 
@@ -97,9 +100,8 @@ namespace iNetworkClient
                     }
                     else
                     {
-                        rightEllipse.Opacity = 0;
-                        Canvas.SetLeft(rightEllipse, 0);
-                        Canvas.SetTop(rightEllipse, 0);
+                        //DisableTracking();
+                        InSelectionMode = false;
 
                         UpdateStoryboards();
                         SetStoryboardStatus(true);
@@ -277,6 +279,11 @@ namespace iNetworkClient
             UpdateStoryboards();
             SetStoryboardStatus(true);
 
+            gestureController = new GestureController();
+            gestureController.GestureRecognized += new EventHandler<GestureEventArgs>(gestureController_GestureRecognized);
+
+            RegisterGestures();
+
             #region Kinect Setup
 
             // Look through all sensors and start the first connected one.
@@ -329,6 +336,79 @@ namespace iNetworkClient
             #endregion
         }
 
+        private void RegisterGestures()
+        {
+            IRelativeGestureSegment[] waveRightSegments = new IRelativeGestureSegment[6];
+            WaveRightSegment1 waveRightSegment1 = new WaveRightSegment1();
+            WaveRightSegment2 waveRightSegment2 = new WaveRightSegment2();
+            waveRightSegments[0] = waveRightSegment1;
+            waveRightSegments[1] = waveRightSegment2;
+            waveRightSegments[2] = waveRightSegment1;
+            waveRightSegments[3] = waveRightSegment2;
+            waveRightSegments[4] = waveRightSegment1;
+            waveRightSegments[5] = waveRightSegment2;
+            gestureController.AddGesture("WaveRight", waveRightSegments);
+
+            IRelativeGestureSegment[] waveLeftSegments = new IRelativeGestureSegment[6];
+            WaveLeftSegment1 waveLeftSegment1 = new WaveLeftSegment1();
+            WaveLeftSegment2 waveLeftSegment2 = new WaveLeftSegment2();
+            waveLeftSegments[0] = waveLeftSegment1;
+            waveLeftSegments[1] = waveLeftSegment2;
+            waveLeftSegments[2] = waveLeftSegment1;
+            waveLeftSegments[3] = waveLeftSegment2;
+            waveLeftSegments[4] = waveLeftSegment1;
+            waveLeftSegments[5] = waveLeftSegment2;
+            gestureController.AddGesture("WaveLeft", waveLeftSegments);
+        }
+
+        private bool _inSelectionMode = false;
+        public bool InSelectionMode
+        {
+            get { return _inSelectionMode; }
+            set
+            {
+                _inSelectionMode = value;
+
+                if (value)
+                {
+                    trackingEllipse.Visibility = System.Windows.Visibility.Visible;
+                    //SkeletonViz.Visibility = System.Windows.Visibility.Collapsed;
+                    trackingEllipse.Opacity = 1;
+                }
+                else
+                {
+                    trackingEllipse.Visibility = System.Windows.Visibility.Collapsed;
+                    //SkeletonViz.Visibility = System.Windows.Visibility.Visible;
+                    DisableTracking();
+                }
+            }
+        }
+
+        private void DisableTracking()
+        {
+            trackingEllipse.Opacity = 0;
+            Canvas.SetLeft(trackingEllipse, 0);
+            Canvas.SetTop(trackingEllipse, 0);
+        }
+
+        JointType TrackingJoint = JointType.HandRight;
+        void gestureController_GestureRecognized(object sender, GestureEventArgs e)
+        {
+            switch (e.GestureName)
+            {
+                case "WaveLeft":
+                    TrackingJoint = JointType.HandLeft;
+                    trackingBrush.ImageSource = new BitmapImage(new Uri(@"../../Resources/leftHand.png", UriKind.Relative));
+                    break;
+                case "WaveRight":
+                    TrackingJoint = JointType.HandRight;
+                    trackingBrush.ImageSource = new BitmapImage(new Uri(@"../../Resources/rightHand.png", UriKind.Relative));
+                    break;
+            }
+
+            InSelectionMode = !InSelectionMode;
+        }
+
         private void UpdateStoryboards()
         {
             foreach (object o in MainScatterView.Items)
@@ -351,8 +431,6 @@ namespace iNetworkClient
                 {
                     pair.Value.Stop();
                 }
-
-                //UpdateStoryboards();
             }
         }
 
@@ -382,37 +460,37 @@ namespace iNetworkClient
 
                 if (playerSkeleton != null)
                 {
+                    gestureController.UpdateAllGestures(playerSkeleton);
+
                     Joint j = playerSkeleton.Joints[JointType.ShoulderCenter];
                     PlayerDepth = j.Position.Z;
 
-                    //Joint leftHand = playerSkeleton.Joints[JointType.HandLeft];
-                    //Joint leftPoint = SkeletalExtensions.ScaleTo(leftHand, (int)SkeletonViz.ActualWidth, (int)SkeletonViz.ActualHeight);
-                    //Canvas.SetLeft(leftEllipse, leftPoint.Position.X);
-                    //Canvas.SetTop(leftEllipse, leftPoint.Position.Y);
-
-                    Joint rightHand = playerSkeleton.Joints[JointType.HandRight];
-                    Joint rightPoint = SkeletalExtensions.ScaleTo(rightHand, (int)SkeletonViz.ActualWidth, (int)SkeletonViz.ActualHeight);
-
-                    Canvas.SetLeft(rightEllipse, rightPoint.Position.X);
-                    Canvas.SetTop(rightEllipse, rightPoint.Position.Y);
-
-                    DependencyObject sa = MainScatterView.InputHitTest(new Point(rightPoint.Position.X, rightPoint.Position.Y)) as DependencyObject;
-
-                    while (sa != null && sa.GetType() != typeof(ScatterViewItem))
-                        sa = VisualTreeHelper.GetParent(sa);
-
-                    if (sa != null)
+                    if (InSelectionMode)
                     {
-                        if (HoveredItem == null)
+                        Joint trackingHand = playerSkeleton.Joints[TrackingJoint];
+                        Joint trackingPoint = SkeletalExtensions.ScaleTo(trackingHand, (int)SkeletonViz.ActualWidth, (int)SkeletonViz.ActualHeight);
+
+                        Canvas.SetLeft(trackingEllipse, trackingPoint.Position.X);
+                        Canvas.SetTop(trackingEllipse, trackingPoint.Position.Y);
+
+                        DependencyObject sa = MainScatterView.InputHitTest(new Point(trackingPoint.Position.X, trackingPoint.Position.Y)) as DependencyObject;
+
+                        while (sa != null && sa.GetType() != typeof(ScatterViewItem))
+                            sa = VisualTreeHelper.GetParent(sa);
+
+                        if (sa != null)
                         {
-                            HoveredItem = (ScatterViewItem)sa; 
-                            HoverTimer.Start();
+                            if (HoveredItem == null)
+                            {
+                                HoveredItem = (ScatterViewItem)sa;
+                                HoverTimer.Start();
+                            }
                         }
-                    }
-                    else
-                    {
-                        HoveredItem = null;
-                        HoverTimer.Stop();
+                        else
+                        {
+                            HoveredItem = null;
+                            HoverTimer.Stop();
+                        }
                     }
                 }
                 else

@@ -11,7 +11,11 @@
         <s:ScatterView x:Name="MainScatterView"/>
         
         <Canvas Name="dotCanvas">
-            <Ellipse Width="10" Height="10" Name="rightEllipse" Fill="Red" Opacity="0"></Ellipse>
+            <Ellipse Width="64" Height="64" Name="trackingEllipse" Opacity="0" Visibility="Collapsed">
+                <Ellipse.Fill>
+                    <ImageBrush ImageSource="/iNetwork%20WPF%20Client1;component/Resources/rightHand.png" x:Name="trackingBrush" />
+                </Ellipse.Fill>
+            </Ellipse>
 
         </Canvas>
        
