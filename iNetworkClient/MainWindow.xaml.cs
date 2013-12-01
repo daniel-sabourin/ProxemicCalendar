@@ -224,9 +224,9 @@ namespace iNetworkClient
                 }));
             };
 
-            MainScatterView.Items.Add(new CalendarEvent("Doctor", CreateImageFromFile("../../Resources/Koala.jpg"), DateTime.Now).CreateScatterViewItem());
+            MainScatterView.Items.Add(new CalendarEvent("Christmas", CreateImageFromFile("../../Resources/christmas.png"), DateTime.Parse("25/12/2013")).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/birds.png"), DateTime.Now).CreateScatterViewItem());
-            MainScatterView.Items.Add(new CalendarEvent("Globalfest", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Now).CreateScatterViewItem());
+            MainScatterView.Items.Add(new CalendarEvent("New Years", CreateImageFromFile("../../Resources/fireworks.png"), DateTime.Parse("31/12/2013")).CreateScatterViewItem());
             MainScatterView.Items.Add(new CalendarEvent("Vet Appt", CreateImageFromFile("../../Resources/dog.png"), DateTime.Now).CreateScatterViewItem());
 
             CreateIndicatorStoryboard();
