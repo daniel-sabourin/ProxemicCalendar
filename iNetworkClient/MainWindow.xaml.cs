@@ -396,16 +396,20 @@ namespace iNetworkClient
             switch (e.GestureName)
             {
                 case "WaveLeft":
+                    if(TrackingJoint == JointType.HandLeft)
+                        InSelectionMode = !InSelectionMode;
+
                     TrackingJoint = JointType.HandLeft;
                     trackingBrush.ImageSource = new BitmapImage(new Uri(@"../../Resources/leftHand.png", UriKind.Relative));
                     break;
                 case "WaveRight":
+                    if (TrackingJoint == JointType.HandRight)
+                        InSelectionMode = !InSelectionMode;
+
                     TrackingJoint = JointType.HandRight;
                     trackingBrush.ImageSource = new BitmapImage(new Uri(@"../../Resources/rightHand.png", UriKind.Relative));
                     break;
             }
-
-            InSelectionMode = !InSelectionMode;
         }
 
 
